@@ -262,14 +262,16 @@ public class LatticeTest {
     	}
 	
 
-    	Collection<Edge> fused_edges = fused_lattice.getEdges();
-    Iterator<Edge> edgeIterator = fused_edges.iterator();
-    
+    	Lattice dummy = fused_lattice;
+    	
     	while(edge2_iterator.hasNext()){
     		Edge current_edge = edge2_iterator.next();
+    		System.out.println("Iteration ");
+    		Collection<Edge> fused_edges = dummy.getEdges();
+    	    Iterator<Edge> edgeIterator = fused_edges.iterator();
     		while(edgeIterator.hasNext()) {
     			Edge edge = edgeIterator.next();
-				if((current_edge.getFromNode() != edge .getFromNode()) || 
+				if((current_edge.getFromNode() != edge.getFromNode()) || 
     					(current_edge.getToNode() != edge.getToNode())) {
     				fused_lattice.addEdge(current_edge.getFromNode(), 
     						current_edge.getToNode(), current_edge.getAcousticScore(), current_edge.getLMScore());
