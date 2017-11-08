@@ -50,17 +50,23 @@ public class LatticeCombination {
 		ConfigSetup conf = new ConfigSetup();
 		SpeechResult result10dB = recog(config,conf,AcModel[3],speechFilePath);
 		
-			System.out
-					.println("Result from AM_10dB is:" + result10dB.getResult()); 
+			System.out.println("Result from AM_10dB is:" + result10dB.getResult()); 
 			SpeechResult result15dB = recog(config,conf,AcModel[2],speechFilePath);
 			
-			System.out
-			.println("Result from AM_15dB is:" + result15dB.getResult()); 
-	      // Building the combination of two AMs
+			System.out.println("Result from AM_15dB is:" + result15dB.getResult()); 
+	      // Gettting lattices results for each AM
 		Lattice lattice10dB = new Lattice(result10dB.getResult());
 	    	Lattice lattice15dB = new Lattice(result15dB.getResult());
-	    	double[] LL_SPS = {-1e4,-2e4};
-	    	Lattice new_lattice = CombineLattice(lattice10dB, lattice15dB, LL_SPS);
+	    	lattice10dB.dumpDot("lattice10dBBeforeUpdate.dot", "lattice10dB.dot");
+	    	lattice15dB.dumpDot("lattice15dBBeforeUpdate.dot", "lattice15dB.dot");
+	    	
+	    	// Update the AM using the SNR estimator
+	    	double[] LL_SPS = {-10e7,-10e7};
+	    	lattice10dB = LatticeTest.UpdateAcousticScore(lattice10dB, LL_SPS[0]);
+	    	lattice15dB = LatticeTest.UpdateAcousticScore(lattice15dB, LL_SPS[1]);
+	    	
+	    	//Lattice new_lattice = CombineLattice(lattice10dB, lattice15dB, LL_SPS);
+	    	Lattice new_lattice = LatticeTest.CombineLattice(lattice10dB, lattice15dB);
 	    	System.out.println("Finished ........");
 	    	lattice10dB.dumpDot("lattice10dB.dot", "lattice10dB.dot");
 	    	lattice15dB.dumpDot("lattice15dB.dot", "lattice15dB.dot");
@@ -105,24 +111,33 @@ public class LatticeCombination {
     	Iterator<Node> node2_iterator = nodes2.iterator();
     	Iterator<Edge> edge2_iterator = edges2.iterator();
 
+    	// ignore first node and first edge
+    	Node current_node = node1_iterator.next();
+    	Edge current_edge = edge1_iterator.next();
+    	
     	while(node1_iterator.hasNext()){
-    		Node current_node = node1_iterator.next();
-    		fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
+    	     current_node = node1_iterator.next();
+    		fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(),
+    				+ current_node.getBeginTime(), current_node.getEndTime());
     	}
     	
     	while(edge1_iterator.hasNext()){
-    		Edge current_edge = edge1_iterator.next();
+    	     current_edge = edge1_iterator.next();
     		double AC_score = LL_SPS[0]+current_edge.getAcousticScore();
     		
     		fused_lattice.addEdge(current_edge.getFromNode(), current_edge.getToNode(), AC_score, current_edge.getLMScore());
     	}
 	
+    	// ignore first node and first edge
+    	current_node = node2_iterator.next();
+    current_edge = edge1_iterator.next();
+    	
     	while(node2_iterator.hasNext()){
-    		Node current_node = node2_iterator.next();
+    	    current_node = node2_iterator.next();
     		fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
     	}
     	while(edge2_iterator.hasNext()){
-    		Edge current_edge = edge2_iterator.next();
+    		 current_edge = edge2_iterator.next();
     		double AC_score = LL_SPS[1]+current_edge.getAcousticScore();
     		
     		fused_lattice.addEdge(current_edge.getFromNode(), current_edge.getToNode(), AC_score, current_edge.getLMScore());

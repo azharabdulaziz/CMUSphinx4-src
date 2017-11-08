@@ -40,7 +40,7 @@ public class Transcribe {
 
     public static void main(String[] args) throws IOException {
     	//WOW, best way to get rid of WARNINGS and info in the log an stop showing them on console
-    			//System.err.close();
+    			System.err.close();
     			
     	System.out.println("Speech file Abs Path: " + speechFilePath);
         

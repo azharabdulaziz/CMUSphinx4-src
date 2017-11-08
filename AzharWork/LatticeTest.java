@@ -26,12 +26,12 @@ public class LatticeTest {
     			//System.err.close();
 			float languageModelWeightAdjustment = 1;
 		
-			String[] label1 = {"A","B"};
+		String[] label1 = {"A","B"};
     		String[] label2 = {"C","D"};
     		//String[] label3 = {"GG","HH","II"};
     		
     		Lattice lattice1 = CreateLattice(label1,4);
-			Lattice lattice2 = CreateLattice(label2,1);
+		Lattice lattice2 = CreateLattice(label2,1);
 			//Lattice lattice3 = CreateLattice(label3,31);
 			
 			//Update acoustic score using the SPS estimator
@@ -60,20 +60,33 @@ public class LatticeTest {
 			
 			
 			
-			// Getting results
-			Lattice lattice = CombineLattice(lattice1, lattice2);
+			// Combine results lattices
+			Lattice latticeOfTwo = CombineLattice(lattice1, lattice2);
+			Lattice latticeOfThree = CombineLattice(latticeOfTwo, lattice1);
 			
 			//System.out.println("Before Computing Node Posterior.........." );
-	    	  // DisplayLattice(lattice);
+	    	   // DisplayLattice(lattice);
 	    	   
+			// Compute posteriori
 			//lattice.computeNodePosteriors(languageModelWeightAdjustment);
-			lattice.computeNodePosteriors(languageModelWeightAdjustment, true);
-			System.out.println("After Computing Node Posterior.........." );
-	    	   DisplayLattice(lattice);
+			//latticeOfTwo.computeNodePosteriors(languageModelWeightAdjustment, true);
+		   //System.out.println("After Computing Node Posterior.........." );
+	    	   // DisplayLattice(latticeOfTwo);
 	    	
+			// Estimate best path using Viterbi Algorithm
+		   //  System.out.println(latticeOfTwo.getViterbiPath());
 			
-			System.out.println(lattice.getViterbiPath());
-			lattice.dumpDot("lattice.dot", "lttice.dot");
+		//  Show all paths
+//		System.out.println("All Paths for Fused Lattice are:");
+//	    	System.out.println(latticeOfTwo.allPaths());
+//		System.out.println("All Edges:");
+//		System.out.println(latticeOfTwo.getEdges());
+//		System.out.println("First Edge");
+//		System.out.println(latticeOfTwo.getEdges().iterator().next().getFromNode());
+			
+			// Dump lattices
+			latticeOfTwo.dumpDot("latticeOfTwo.dot", "ltticeOfTwo.dot");
+			latticeOfThree.dumpDot("latticeOfThree.dot", "latticeOfThree.dot");
 			
 			
     	}
@@ -184,7 +197,7 @@ public class LatticeTest {
 	   System.out.println("Initial Node: " + init);
 	   System.out.println("Terminal Node:" + term);
    }
-        public static Lattice CombineLattice(Lattice lattice1, Lattice lattice2){
+  public static Lattice CombineLattice(Lattice lattice1, Lattice lattice2){
     	Lattice fused_lattice = new Lattice();
     	
     	Node initialNode = lattice1.getInitialNode();
@@ -214,6 +227,7 @@ public class LatticeTest {
     	Iterator<Node> node2_iterator = nodes2.iterator();
     	Iterator<Edge> edge2_iterator = edges2.iterator();
 
+    	// Add Nodes to the new fused lattice
     	while(node1_iterator.hasNext()){
     		Node current_node = node1_iterator.next();
     		// Change the start and end words id <s> and </s>
@@ -226,7 +240,6 @@ public class LatticeTest {
     		
     		fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
     	}
-    	
     	
     	while(node2_iterator.hasNext()){
     		Node current_node = node2_iterator.next();
@@ -242,26 +255,48 @@ public class LatticeTest {
     		fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
     	}
     	
+    	// Add edges to the new fused lattice
     	while(edge1_iterator.hasNext()){
     		Edge current_edge = edge1_iterator.next();
-    		
-    		
     		fused_lattice.addEdge(current_edge.getFromNode(), current_edge.getToNode(), current_edge.getAcousticScore(), current_edge.getLMScore());
     	}
 	
+
+    	Collection<Edge> fused_edges = fused_lattice.getEdges();
+    Iterator<Edge> edgeIterator = fused_edges.iterator();
+    
     	while(edge2_iterator.hasNext()){
     		Edge current_edge = edge2_iterator.next();
+    		while(edgeIterator.hasNext()) {
+    			Edge edge = edgeIterator.next();
+				if((current_edge.getFromNode() != edge .getFromNode()) || 
+    					(current_edge.getToNode() != edge.getToNode())) {
+    				fused_lattice.addEdge(current_edge.getFromNode(), 
+    						current_edge.getToNode(), current_edge.getAcousticScore(), current_edge.getLMScore());
+    				
+    			}
+    		}
     		
-    		
-    		fused_lattice.addEdge(current_edge.getFromNode(), current_edge.getToNode(), current_edge.getAcousticScore(), current_edge.getLMScore());
     	}
-    /*
-     * Adding initial and terminal  
-     */
+    	
+//    Collection<Edge> fused_edges = fused_lattice.getEdges();
+//    Iterator<Edge> edgeIterator = fused_edges.iterator();
+//    while(edgeIterator.hasNext()){
+//    		Edge current_edge = edgeIterator.next();
+//    		
+//    		boolean test = current_edge.equals(fused_edges);
+//    		if(test) {
+//    			
+//    		}
+//    		 
+//    		
+//    }
+    	
     return fused_lattice;	
 
     }
         
+  
     public static Lattice UpdateAcousticScore(Lattice lattice,double LL_SPS){
     	Lattice new_lattice = new Lattice();
     	
