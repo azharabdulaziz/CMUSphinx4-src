@@ -42,7 +42,7 @@ public class Context {
     public Context(Configuration config)
         throws IOException, MalformedURLException
     {
-        this("resource:/azharTranscriber/default.config.xml", config);
+        this("default.config.xml", config);
     }
 
     /**

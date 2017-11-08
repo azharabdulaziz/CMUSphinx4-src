@@ -19,20 +19,24 @@ import edu.cmu.sphinx.result.WordResult;
 
 public class LatticeCombination {
 	
-	static String DirectoryPath = "/Users/Azhar/Desktop/Exp1/timit/wav/";
+
+	static String WavePath = "/Users/Azhar/Desktop/Exp1/timit/wav/";
 	//static String fileName = "TEST/DR1/FAKS0/SI2203"; 
 	static String fileName2 = "test/DR4/FEDW0/SI1653"; // He spoke soothingly.
-	
+
 	// Define acoustic models
-	static String AcModelClean ="/Users/Azhar/Desktop/TIMIT_AM/timit_Clean.cd_cont_200/";
-	static String AcModel20 ="/Users/Azhar/Desktop/TIMIT_AM/timit_20dB.cd_cont_200/";
-	static String AcModel15 ="/Users/Azhar/Desktop/TIMIT_AM/timit_15dB.cd_cont_200/";
-	static String AcModel10 ="/Users/Azhar/Desktop/TIMIT_AM/timit_10dB.cd_cont_200/";
-	
-	static String[] AcModel = {AcModelClean, AcModel20,AcModel15,AcModel10};
-	
-	static String speechFilePath = DirectoryPath+ fileName2+".WAV";
-	static String textFilePath = DirectoryPath+ fileName2+".TXT";
+		static String ModelsPath = "/Users/Azhar/Desktop/NoisyModels/TIMIT_AM/";
+		static String AcModel0 ="timit_Clean.cd_cont_200";
+		static String AcModel20 ="timit_20dB.cd_cont_200";
+		static String AcModel15 ="timit_15dB.cd_cont_200";
+		static String AcModel10 ="timit_10dB.cd_cont_200";
+		static String[] AcModel = {AcModel0, AcModel20,AcModel15,AcModel10};
+		
+		static String DictName = "timit.dic";
+		static final String LM_Name = "TIMIT_test.lm";
+		static String speechFilePath = WavePath+ fileName2+".WAV";
+		static String textFilePath = WavePath+ fileName2+".TXT";
+
 	 
     public static void main(String[] args) throws IOException {
     	//WOW, best way to get rid of WARNINGS and info in the log an stop showing them on console
@@ -53,7 +57,7 @@ public class LatticeCombination {
 			System.out
 			.println("Result from AM_15dB is:" + result15dB.getResult()); 
 	      // Building the combination of two AMs
-			Lattice lattice10dB = new Lattice(result10dB.getResult());
+		Lattice lattice10dB = new Lattice(result10dB.getResult());
 	    	Lattice lattice15dB = new Lattice(result15dB.getResult());
 	    	double[] LL_SPS = {-1e4,-2e4};
 	    	Lattice new_lattice = CombineLattice(lattice10dB, lattice15dB, LL_SPS);
@@ -68,7 +72,7 @@ public class LatticeCombination {
     
     public static SpeechResult recog(Configuration config,ConfigSetup conf, String AcModel, String speechFilePath) throws IOException{
 
-		StreamSpeechRecognizer recognizer = conf.BuildRecognizer(AcModel, config);
+		StreamSpeechRecognizer recognizer = conf.BuildRecognizer(ModelsPath , DictName, LM_Name,AcModel, config);
 		
 		
 		// Start recognition
@@ -83,8 +87,10 @@ public class LatticeCombination {
     public static Lattice CombineLattice(Lattice lattice1, Lattice lattice2, double[] LL_SPS){
     	Lattice fused_lattice = new Lattice();
     	
+    	// For initial node in the new lattice
     	Node initialNode = lattice1.getInitialNode();
     	Node terminalNode = lattice1.getTerminalNode();
+    	
     	Collection<Edge> edges1 = lattice1.getEdges();
     	Collection<Node> nodes1 = lattice1.getNodes();
     	

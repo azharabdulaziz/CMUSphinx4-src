@@ -10,14 +10,16 @@ import edu.cmu.sphinx.result.Edge;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.LatticeOptimizer;
 import edu.cmu.sphinx.result.Node;
+//import edu.cmu.sphinx.result.SausageMaker;
 import edu.cmu.sphinx.result.WordResult;
+//import edu.cmu.sphinx.result.AbstractSausageMaker;
 
 
 public class LatticeTest {
 	
 	
 	 
-    private static final double[] LL_SPS = {6,3,-0.1};
+    private static final double[] LL_SPS = {1,0.4,1};
 
 	public static void main(String[] args) throws IOException {
     	//WOW, best way to get rid of WARNINGS and info in the log an stop showing them on console
@@ -26,36 +28,53 @@ public class LatticeTest {
 		
 			String[] label1 = {"A","B"};
     		String[] label2 = {"C","D"};
-    		String[] label3 = {"GG","HH","II"};
+    		//String[] label3 = {"GG","HH","II"};
     		
-    		Lattice lattice1 = CreateLattice(label1,1);
-			Lattice lattice2 = CreateLattice(label2,4);
+    		Lattice lattice1 = CreateLattice(label1,4);
+			Lattice lattice2 = CreateLattice(label2,1);
 			//Lattice lattice3 = CreateLattice(label3,31);
 			
 			//Update acoustic score using the SPS estimator
-			lattice1 = UpdateAcousticScore(lattice1, LL_SPS[0]);
-			lattice2 = UpdateAcousticScore(lattice2, LL_SPS[1]);
+			//lattice1 = UpdateAcousticScore(lattice1, LL_SPS[0]);
+			//lattice2 = UpdateAcousticScore(lattice2, LL_SPS[1]);
 			//lattice3 = UpdateAcousticScore(lattice3, LL_SPS[2]);
 			
 			
-			Lattice lattice = CombineLattice(lattice1, lattice2);
+			
 			//Lattice lattice = CombineLattice(lattice3, lattice4);
 			//DisplayLattice(lattice);
 			
     		// Optimization
-    		LatticeOptimizer optimizer=new LatticeOptimizer(lattice);
-    	    optimizer.optimize();
-    		
+    		//LatticeOptimizer optimizer=new LatticeOptimizer(lattice);
+    	    //optimizer.optimize();
+    	    
+			lattice1.computeNodePosteriors(languageModelWeightAdjustment, true,LL_SPS[0]);
+			   
+			
+			lattice2.computeNodePosteriors(languageModelWeightAdjustment,true,LL_SPS[1]);
 			
     		lattice1.dumpDot("lattice1.dot", "lttice1.dot");
+    		
 			lattice2.dumpDot("lattice2.dot", "lttice2.dot");
 			//lattice3.dumpDot("lattice3.dot", "lttice3.dot");
-			lattice.dumpDot("lattice.dot", "lttice.dot");
+			
+			
 			
 			// Getting results
+			Lattice lattice = CombineLattice(lattice1, lattice2);
+			
+			//System.out.println("Before Computing Node Posterior.........." );
+	    	  // DisplayLattice(lattice);
+	    	   
 			//lattice.computeNodePosteriors(languageModelWeightAdjustment);
 			lattice.computeNodePosteriors(languageModelWeightAdjustment, true);
+			System.out.println("After Computing Node Posterior.........." );
+	    	   DisplayLattice(lattice);
+	    	
+			
 			System.out.println(lattice.getViterbiPath());
+			lattice.dumpDot("lattice.dot", "lttice.dot");
+			
 			
     	}
     
@@ -81,7 +100,8 @@ public class LatticeTest {
 		for(i=0; i<l;i++){
 			id=Integer.toString(ids+1+i);
 			if(i==0){
-				firstID = Integer.toString(ids);
+				firstID =  Integer.toString(ids);
+				
 			}
 			
 			kk=kk-1;
@@ -104,7 +124,12 @@ public class LatticeTest {
 		 * Adding edges to formulate lattice
 		 */
 		
-		double score = 0;
+		double score = 1;
+		/*double backwardScore=1+Math.random()*100;;
+		double forwardScore = 1;
+		double posterior = 1+Math.random()*100;
+		double viterbiScore = 1;*/
+		
 		Iterator<Node> nodes = lattice.getNodes().iterator();
 		
 		Node initialNode = nodes.next();
@@ -113,9 +138,15 @@ public class LatticeTest {
 		while(nodes.hasNext()){
 			k=k+1;
 			currentNode = nodes.next();
+			
+			/*currentNode.setBackwardScore(backwardScore);
+			currentNode.setForwardScore(forwardScore);
+			currentNode.setPosterior(posterior);
+			currentNode.setViterbiScore(viterbiScore);*/
+			
 			//System.out.println("Current Node: " + currentNode.getWord());
-			double acousticScore = score+k;
-			double lmScore = score-k;
+			double acousticScore = score;
+			double lmScore = score;
 			lattice.addEdge(fromNode, currentNode, acousticScore, lmScore);
 			//System.out.println("From Node " + fromNode.getWord() + " --> " + currentNode.getWord());
 			fromNode = currentNode;
@@ -138,6 +169,11 @@ public class LatticeTest {
 		while(nodes2.hasNext()){
 			Node cur = nodes2.next();
 			System.out.println("Node(" + cur.getId() + "): " + cur.getWord()); 
+			System.out.println("ForwardScore = " + cur.getForwardScore());
+			System.out.println("BackwardScore = " + cur.getBackwardScore());
+			System.out.println("ViterbiScore = " + cur.getViterbiScore());
+			System.out.println("Posterior = " + cur.getPosterior());
+			
 		}
     }
     
