@@ -193,4 +193,24 @@ public class Edge {
                 (fromNode.isEquivalent(other.getFromNode()) &&
                         toNode.isEquivalent(other.getToNode())));
     }
+    
+    /**
+     * Returns true if the given edge has the same direction as this edge. 
+     * Two edges are the same (wether equivalent or not) only if they have their 'fromNode' and 'toNode' are equivalent. 
+     * Regardless of their acoustic and language scores.
+    
+     * Added By Azhar Abdulaziz in November, 2017.
+     * 
+     * @param other the Edge to compare this Edge against
+     * @return true if the Edges are directing from and to same nodes; false otherwise
+     * 
+     */
+    public boolean isInLine(Edge other) {
+       
+       
+        return ((fromNode.isEquivalent(other.getFromNode()) &&
+                        toNode.isEquivalent(other.getToNode())));
+    }
 }
+
+
