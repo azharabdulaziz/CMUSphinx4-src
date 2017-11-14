@@ -42,18 +42,15 @@ public class LatticeCombination {
     	//WOW, best way to get rid of WARNINGS and info in the log an stop showing them on console
     			System.err.close();
     	
-    	System.out.println("Speech file Abs Path: " + speechFilePath);
-        
-        System.out.println("Reference Utterance: He spoke soothingly.");
       
         Configuration config = new Configuration();
 		ConfigSetup conf = new ConfigSetup();
 		SpeechResult result10dB = recog(config,conf,AcModel[3],speechFilePath);
 		
-			System.out.println("Result from AM_10dB is:" + result10dB.getResult()); 
+			 
 			SpeechResult result15dB = recog(config,conf,AcModel[2],speechFilePath);
 			
-			System.out.println("Result from AM_15dB is:" + result15dB.getResult()); 
+			 
 	      // Gettting lattices results for each AM
 		Lattice lattice10dB = new Lattice(result10dB.getResult());
 	    	Lattice lattice15dB = new Lattice(result15dB.getResult());
@@ -61,12 +58,34 @@ public class LatticeCombination {
 	    	lattice15dB.dumpDot("lattice15dBBeforeUpdate.dot", "lattice15dB.dot");
 	    	
 	    	// Update the AM using the SNR estimator
-	    	double[] LL_SPS = {-10e7,-10e7};
-	    	lattice10dB = LatticeTest.UpdateAcousticScore(lattice10dB, LL_SPS[0]);
-	    	lattice15dB = LatticeTest.UpdateAcousticScore(lattice15dB, LL_SPS[1]);
+//	    	double[] LL_SPS = {-10e7,-10e7};
+//	    	lattice10dB = LatticeTest.UpdateAcousticScore(lattice10dB, LL_SPS[0]);
+//	    	lattice15dB = LatticeTest.UpdateAcousticScore(lattice15dB, LL_SPS[1]);
 	    	
 	    	//Lattice new_lattice = CombineLattice(lattice10dB, lattice15dB, LL_SPS);
-	    	Lattice new_lattice = LatticeTest.CombineLattice(lattice10dB, lattice15dB);
+	   // 	Lattice new_lattice = LatticeTest.CombineLattice(lattice10dB, lattice15dB);
+	    	Lattice new_lattice = CombineLattice.Combine(lattice10dB, lattice15dB);
+	    	
+	    	//Results
+	    	
+	    System.out.println("Speech file Abs Path: " + speechFilePath);
+	        
+	    System.out.println("Reference Utterance: He spoke soothingly.");
+	   
+	    	System.out.println("Result from AM_10dB is:" + result10dB.getResult());
+	    	System.out.println("Result from AM_15dB is:" + result15dB.getResult());
+	    	
+	    	// New combined results
+	    	new_lattice.computeNodePosteriors(1.0f);
+	    	List<WordResult> x = new_lattice.getWordResultPath();
+	    	
+	    	Iterator<WordResult> i = x.iterator();
+	    	while(i.hasNext()) {
+	    		System.out.println(i.next());
+	    	}
+	    	System.out.println("New result:" + x);
+	    	
+	    	// Store lattice
 	    	System.out.println("Finished ........");
 	    	lattice10dB.dumpDot("lattice10dB.dot", "lattice10dB.dot");
 	    	lattice15dB.dumpDot("lattice15dB.dot", "lattice15dB.dot");

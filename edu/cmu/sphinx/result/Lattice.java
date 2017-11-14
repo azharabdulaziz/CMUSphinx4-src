@@ -501,14 +501,15 @@ public class Lattice {
 
     public Edge updateEdge(Edge edge, double acousticScore, double lmScore) {
    
-    Set<Edge> edges = this.edges;
+    //Edge e = new Edge(acousticScore, lmScore);
     Iterator<Edge> ei = edges.iterator(); 
     while(ei.hasNext()) {
     		Edge currentEdge = ei.next();
-    		if(currentEdge.isEquivalent(edge)) {
-    			currentEdge.acousticScore = acousticScore;
-    			currentEdge.lmScore = lmScore;
+    		if(currentEdge.isParallel(edge)) {
+    			currentEdge.setAcousticScore(acousticScore);
+    			currentEdge.setLMScore(lmScore);
     		}
+    		
     }
      	
     return edge;
