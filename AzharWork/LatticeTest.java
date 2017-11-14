@@ -55,6 +55,8 @@ public class LatticeTest {
 		
 		System.out.println("Combining Three ");
 		Lattice latticeOfThree = CombineLattice(lattice1,latticeOfTwo);
+		LatticeOptimizer optimizer = new LatticeOptimizer(latticeOfThree);
+		optimizer.optimize();
 		//latticeOfThree = CorrectMultipleEdges(latticeOfThree);
 		
 		//System.out.println("Before Computing Node Posterior.........." );
@@ -302,6 +304,35 @@ public class LatticeTest {
 	}
 
 
+	/*
+	 * Combine the edges that come from the same node and directing to the same node.
+	 */
+	private static Lattice OptimizeEdges(Lattice lattice) {
+		Collection<Node> nodes = lattice.getNodes();
+		Iterator<Node> nodesIterator = nodes.iterator();
+		//For each node
+		while(nodesIterator.hasNext()) {
+			Node CurrentNode = nodesIterator.next();
+			Collection<Edge> edges = CurrentNode.getLeavingEdges();
+			Iterator<Edge> EdgeIter = edges.iterator();
+			while(EdgeIter.hasNext()) {
+				Edge edge = EdgeIter.next();
+				Edge FinallEdge = CurrentNode.findParallelLeavingEdge(edge);
+				while(FinalEdge != null)
+				
+				
+			}
+			
+			
+			
+		}
+		
+		
+		return lattice;
+	}
+	
+	
+	
 	private static Lattice CorrectMultipleEdges(Lattice lattice) {
 		// TODO Remove any multiple edges that exist between two nodes
 		Lattice result = lattice;

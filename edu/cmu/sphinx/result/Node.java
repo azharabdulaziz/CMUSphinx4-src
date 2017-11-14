@@ -651,6 +651,25 @@ public class Node {
     }
 
 
+
+    /**
+     * Returns a leaving edge that points to the same node of a given edge using isParallel() method. 
+     * Two edges are parallel if Edge.IsParallel() returns true.
+     * By: Azhar Abdulaziz
+     * @param edge the Edge to compare the leaving edges of this node against
+     * @return an InLine edge, if any; or null if no InLine edge found
+     */
+    public Edge findParallelLeavingEdge(Edge edge) {
+        for (Edge e : leavingEdges) {
+            if (e.isParallel(edge)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+
+    
     /**
      * Returns the best predecessor for this node.
      *

@@ -195,9 +195,9 @@ public class Edge {
     }
     
     /**
-     * Returns true if the given edge has the same direction as this edge. 
-     * Two edges are the same (wether equivalent or not) only if they have their 'fromNode' and 'toNode' are equivalent. 
-     * Regardless of their acoustic and language scores.
+     * Returns true if the given edge parallel to this edge. 
+     * Two edges are parallel if they connect the same pair of nodes, wether equivalent or not.
+     * This happens only if they their 'fromNode' and 'toNode' are equivalent, egardless of their acoustic and language scores.
     
      * Added By Azhar Abdulaziz in November, 2017.
      * 
@@ -205,7 +205,7 @@ public class Edge {
      * @return true if the Edges are directing from and to same nodes; false otherwise
      * 
      */
-    public boolean isInLine(Edge other) {
+    public boolean isParallel(Edge other) {
        
        
         return ((fromNode.isEquivalent(other.getFromNode()) &&
