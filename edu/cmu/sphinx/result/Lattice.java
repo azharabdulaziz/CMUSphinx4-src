@@ -489,8 +489,8 @@ public class Lattice {
      * Azhar Abdulaziz 2017
      */
 
-    public Edge updateEdge(double accousticScore, double lmScore) {
-    	Edge e = new Edge(accousticScore,lmScore);
+    public Edge updateEdge(double acousticScore, double lmScore) {
+    	Edge e = new Edge(acousticScore,lmScore);
     	return e;
     }
     
