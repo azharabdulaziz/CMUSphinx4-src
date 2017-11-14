@@ -55,8 +55,7 @@ public class LatticeTest {
 		
 		System.out.println("Combining Three ");
 		Lattice latticeOfThree = CombineLattice(lattice1,latticeOfTwo);
-		LatticeOptimizer optimizer = new LatticeOptimizer(latticeOfThree);
-		optimizer.optimize();
+		//latticeOfThree = OptimizeEdges(latticeOfThree);
 		//latticeOfThree = CorrectMultipleEdges(latticeOfThree);
 		
 		//System.out.println("Before Computing Node Posterior.........." );
@@ -289,13 +288,48 @@ public class LatticeTest {
 			fused_lattice.addEdge(currentedge.getFromNode(), currentedge.getToNode(), currentedge.getAcousticScore(), currentedge.getLMScore());
 		}
 
-		// Add the second lattice's edges. 
+		 
+		/*
+		 * Add the second lattice's edges.
+		 * The flag is used to detect existent edge before adding it.
+		 */
+		boolean flag=false;
+		double accScore = 0;
+		double lmScore = 0;
+		
+		
 		Iterator<Edge> edge2_iterator = edges2.iterator();
 		while(edge2_iterator.hasNext()){
-			Edge additionaltedge = edge2_iterator.next();
-			fused_lattice.addEdge(additionaltedge.getFromNode(), 
-					additionaltedge.getToNode(), additionaltedge.getAcousticScore(), additionaltedge.getLMScore());
+			Edge e2 = edge2_iterator.next();
+			
+			Collection<Edge> es1 = lattice1.getEdges();
+			Iterator<Edge> e1_iteraotr = es1.iterator();
+			while(e1_iteraotr.hasNext()) {
+				Edge e1 = e1_iteraotr.next();
+				if(e2.isParallel(e1)) {
+					flag = true;
+					System.out.println("Found Parallel edges Current Edge:" + e2 + " And e1:" + e1); 
+					accScore = e1.getAcousticScore() + e2.getAcousticScore();
+					lmScore = e1.getLMScore() + e2.getLMScore();
+					
+				}
+				
+			}
+			
+			if(flag) {
+				fused_lattice.updateEdge(accScore, lmScore);
+				
+				flag = false;
+				accScore = 0;
+				lmScore = 0;
+				
+			}
+			else {
+				fused_lattice.addEdge(e2.getFromNode(), 
+						e2.getToNode(), e2.getAcousticScore(), e2.getLMScore());
 
+			}
+			
 		}
 
 
@@ -313,17 +347,27 @@ public class LatticeTest {
 		//For each node
 		while(nodesIterator.hasNext()) {
 			Node CurrentNode = nodesIterator.next();
+			System.out.println("Current Node: " + CurrentNode);
 			Collection<Edge> edges = CurrentNode.getLeavingEdges();
 			Iterator<Edge> EdgeIter = edges.iterator();
+			System.out.println("Leaving edges of current node?:" + EdgeIter.hasNext());
 			while(EdgeIter.hasNext()) {
-				Edge edge = EdgeIter.next();
-				Edge FinallEdge = CurrentNode.findParallelLeavingEdge(edge);
-				while(FinalEdge != null)
-				
-				
+				Edge CurrentEdge = EdgeIter.next();
+				System.out.println("Current Ege" + CurrentEdge);
+				Edge e1 = CurrentNode.findParallelLeavingEdge(CurrentEdge);
+				System.out.println("e1 = " + e1);
+				if(e1 != null) {
+					System.out.println("Parallel Edge Found");
+					CurrentEdge.setAcousticScore(e1.getAcousticScore()+CurrentEdge.getAcousticScore());
+					CurrentEdge.setLMScore(CurrentEdge.getLMScore() + e1.getLMScore());
+					CurrentNode.removeLeavingEdge(e1);
+					lattice.addEdge(CurrentEdge.getFromNode(), CurrentEdge.getToNode(),
+							CurrentEdge.getAcousticScore()+e1.getAcousticScore(), 
+							CurrentEdge.getLMScore() + e1.getLMScore());
+					
+					//CurrentNode.removeLeavingEdge(CurrentEdge);
+				}
 			}
-			
-			
 			
 		}
 		
@@ -348,7 +392,7 @@ public class LatticeTest {
 			while(edgeIterator2.hasNext()) {
 				Edge Testedge = edgeIterator2.next();
 			//	System.out.println("Test edge: " + Testedge);
-				if(currentedge.isInLine(Testedge)) {
+				if(currentedge.isParallel(Testedge)) {
 					k++;
 					System.out.println("k= "+ k + ". For edge:" + Testedge);
 					if(k>=2) {

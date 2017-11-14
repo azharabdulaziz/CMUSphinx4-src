@@ -42,6 +42,22 @@ public class Edge {
     }
 
 
+    /**
+     * Create an Edge from fromNode to toNode with acoustic and Language Model scores.
+     *
+     * @param fromNode from node
+     * @param toNode to node
+     * @param acousticScore acoustic score
+     * @param lmScore langauge model score
+     */
+    protected Edge(double acousticScore, double lmScore) {
+        this.acousticScore = acousticScore;
+        this.lmScore = lmScore;
+        this.fromNode = this.getFromNode();
+        this.toNode = this.getToNode();
+    }
+
+
     @Override
     public String toString() {
         return "Edge(" + fromNode + "-->" + toNode + '[' + acousticScore

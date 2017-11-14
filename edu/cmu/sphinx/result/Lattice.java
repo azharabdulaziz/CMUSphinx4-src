@@ -483,7 +483,17 @@ public class Lattice {
         edges.add(e);
         return e;
     }
+    
+    /*
+     * Update edge:
+     * Azhar Abdulaziz 2017
+     */
 
+    public Edge updateEdge(double accousticScore, double lmScore) {
+    	Edge e = new Edge(accousticScore,lmScore);
+    	return e;
+    }
+    
     /**
      * Add a Node with a given ID that represents the theory that a given word
      * was spoken over a given period of time. This method is used when loading
