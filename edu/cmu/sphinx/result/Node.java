@@ -37,15 +37,6 @@ import java.util.*;
  * computeNodePosteriors} method in the Lattice class for details. </p>
  */
 
-/**
-* January 2015
-* <p/>
-* Combining lattices requires setting the ID of start and the end of speech nodes, i.e. <s> and </s> respectively,
-* to the same values. This is easily done by making the ID changed directly as a method in its own class.
-* So, the method setId(String newId) is added.   
-* @author Azhar Sabah Abdulaziz
-* 
-*/
 
 
 public class Node {
@@ -655,9 +646,11 @@ public class Node {
     /**
      * Returns a leaving edge that points to the same node of a given edge using isParallel() method. 
      * Two edges are parallel if Edge.IsParallel() returns true.
-     * By: Azhar Abdulaziz
+     * 
      * @param edge the Edge to compare the leaving edges of this node against
      * @return an InLine edge, if any; or null if no InLine edge found
+     * @author Azhar Abdulaziz
+     * @since 2017
      */
     public Edge findParallelLeavingEdge(Edge edge) {
         for (Edge e : leavingEdges) {

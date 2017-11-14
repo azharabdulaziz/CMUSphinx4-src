@@ -214,12 +214,13 @@ public class Edge {
      * Returns true if the given edge parallel to this edge. 
      * Two edges are parallel if they connect the same pair of nodes, wether equivalent or not.
      * This happens only if they their 'fromNode' and 'toNode' are equivalent, egardless of their acoustic and language scores.
-    
-     * Added By Azhar Abdulaziz in November, 2017.
+     *  
      * 
      * @param other the Edge to compare this Edge against
      * @return true if the Edges are directing from and to same nodes; false otherwise
      * 
+     * @author Azhar Abdulaziz
+     * @since November, 2017
      */
     public boolean isParallel(Edge other) {
        

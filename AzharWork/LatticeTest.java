@@ -18,6 +18,16 @@ import edu.cmu.sphinx.result.Node;
 import edu.cmu.sphinx.result.WordResult;
 //import edu.cmu.sphinx.result.AbstractSausageMaker;
 
+/**
+* 
+* <p/>
+* Combining lattices requires setting the ID of start and the end of speech nodes, i.e. <s> and </s> respectively,
+* to the same values. This is easily done by making the ID changed directly as a method in its own class.
+* So, the method setId(String newId) is added.   
+* @author Azhar Sabah Abdulaziz
+* @since January, 2015
+* 
+*/
 
 public class LatticeTest {
 
@@ -317,8 +327,7 @@ public class LatticeTest {
 			}
 			
 			if(flag) {
-				fused_lattice.updateEdge(accScore, lmScore);
-				
+				fused_lattice.updateEdge(e2,accScore, lmScore);
 				flag = false;
 				accScore = 0;
 				lmScore = 0;

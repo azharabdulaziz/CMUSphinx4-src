@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -484,14 +485,33 @@ public class Lattice {
         return e;
     }
     
-    /*
-     * Update edge:
-     * Azhar Abdulaziz 2017
+    /**
+     * Update edge \n
+     * This method update the acoustic and language model scores of the givin edge.
+     * It searche for the givin edge in this lattice and update the scores.
+     *  
+     * 
+     *  @param edge: the specific edge to update
+     *  @param acousticScore: the new acoustic score
+     *  @param lmScore: the new language model score
+     *  @return the new updated edge
+     *  @author Azhar Abdulaziz
+     *  @since 2017 
      */
 
-    public Edge updateEdge(double acousticScore, double lmScore) {
-    	Edge e = new Edge(acousticScore,lmScore);
-    	return e;
+    public Edge updateEdge(Edge edge, double acousticScore, double lmScore) {
+   
+    Set<Edge> edges = this.edges;
+    Iterator<Edge> ei = edges.iterator(); 
+    while(ei.hasNext()) {
+    		Edge currentEdge = ei.next();
+    		if(currentEdge.isEquivalent(edge)) {
+    			currentEdge.acousticScore = acousticScore;
+    			currentEdge.lmScore = lmScore;
+    		}
+    }
+     	
+    return edge;
     }
     
     /**
