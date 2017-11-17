@@ -66,8 +66,10 @@ public class StreamSpeechRecognizer extends AbstractSpeechRecognizer {
     }
     
     /**
-     * Azhar Oct 2015
-     * 
+     * @author Azhar Abdulaziz 
+     * @since Oct 2015
+     * @param InputStream 
+     * @return SNR
      */
     public double getSNR(InputStream stream){
     	SpeechClassifier sc = context.getInstance(SpeechClassifier.class);

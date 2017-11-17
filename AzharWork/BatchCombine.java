@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
-
 import edu.cmu.sphinx.api.*;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.WordResult;
@@ -18,7 +17,7 @@ public class BatchCombine {
 
 	static String BaseDir = "/Users/Azhar/Desktop/MDC_Experiments/";
 	static String TestFileIds = "an4/an4_test.fileids";
-	static String BaseWavPath = "/Users/Azhar/Desktop/Exp2/an4/wav/"; 
+	static String BaseWavPath = "/Users/Azhar/Desktop/Exp2/an4/wavWhite50db/"; 
 	// Define acoustic models
 	static String ModelsPath = BaseDir + "an4/AN4_AM/";
 	static String AcModel0 ="an4_Clean.cd_cont_200";
@@ -43,26 +42,61 @@ public class BatchCombine {
 		StreamSpeechRecognizer Recognizer15dB = conf.BuildRecognizer(ModelsPath , DictName, LM_Name,AcModel[2], config);
 		StreamSpeechRecognizer Recognizer10dB = conf.BuildRecognizer(ModelsPath , DictName, LM_Name,AcModel[3], config);
 		StreamSpeechRecognizer[]	Recognizer = {CleanRecognizer,Recognizer20dB,Recognizer15dB,Recognizer10dB};
-
+		
+		
 
 		String finalResult = "";
 
+		
+		PrintWriter out = new PrintWriter("Result.txt");
+		
 		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(new File(BaseDir + TestFileIds));
+		int i =0;
 		while(scan.hasNextLine()){
 			String line = scan.nextLine();
-			String fileName = BaseWavPath + line+".sph";
+			// To extract the file name from relative path
+			String fName = line.substring(line.indexOf("/")+1, line.length());
+			fName = fName.replace("/", "-");
+			String fileName = BaseWavPath + line+".wav";
 			System.out.println("Decoding file: " + fileName);
 			//Here you can manipulate the string the way you want
-			Lattice new_lattice = getCombinedResult(Recognizer, fileName);
+			//Lattice new_lattice = getCombinedResult(Recognizer, fileName);
+			Lattice new_lattice = getSingledResult(Recognizer[0], fileName);
+			//Dump lattice for debug
+			new_lattice.dumpDot("Combined4AMs.dot", "FourAMsTest");
 			// get textual utterance after combining
-			finalResult= finalResult + getFinalReslts(new_lattice)+"\n";
+			finalResult= finalResult + getFinalReslts(new_lattice)+" ("+fName+")" +"\n";
+			finalResult = finalResult.replace("<sil>", "");
+			
+			i++;
+			//System.out.print("\33[1A\33[2K");
+			//System.out.print(finalResult+"  "+ Math.round(100*i/130)+ "%");
+			
 
+			
+			// Store textual utterances in a file
+			boolean done  = StoreTextResult(finalResult, out);
+			if(!done) {
+				System.out.println("Couldn't print the results on file");
+			}
+			
 		}
 
+		
 
-		// Store textual utterances in a file
-		StoreTextResult(finalResult, "Result.txt");
+		//get single result for debug
+/*		System.out.println("Single result for debug.");
+		//String fileName ="/Users/Azhar/Desktop/Exp2/an4/wav/an4test_clstk/menk/an422-menk-b.sph"; // Deleted from fileids
+		String fileName ="/Users/Azhar/Desktop/Exp2/an4/featClean/an4test_clstk/mjwl/an392-mjwl-b.mfc";
+		//Lattice lattice = getSingledResult(Recognizer[0], fileName);
+		Lattice lattice = getCombinedResult(Recognizer, fileName);
+		finalResult = getFinalReslts(lattice);
+*/		
+		
+		
+		
+		
 		System.out.print("Final Result: "+finalResult);    
 
 
@@ -120,6 +154,29 @@ public class BatchCombine {
 
 	/**
 	 * 
+	 * @param Recognizer
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
+	private static Lattice getSingledResult(StreamSpeechRecognizer Recognizer, String fileName ) throws IOException {
+
+		// get results for a single AM
+		SpeechResult result = Decode(Recognizer,fileName);
+		
+		// Getting lattices results for each AM
+		Lattice lattice = new Lattice(result.getResult());
+		
+
+		
+		// Compute posterior, it is required
+		lattice.computeNodePosteriors(1.0f); 
+
+		return lattice;
+	}
+
+	/**
+	 * 
 	 * @param recognizer
 	 * @param speechFilePath
 	 * @return
@@ -162,21 +219,15 @@ public class BatchCombine {
 	 * @param fileName
 	 * @return
 	 */
-	private static boolean StoreTextResult(String result, String fileName) {
+	private static boolean StoreTextResult(String result, PrintWriter out) {
 
 		boolean done = false;
 
-		// Print to text file
-		try {
-			PrintWriter out = new PrintWriter(fileName);
-			out.println(result);
-			out.flush();
-			out.close();
-			done = true;
-		} catch (FileNotFoundException e) {
-			System.out.println("Error: The output file not found");
-			e.printStackTrace();
-		}
+		out.append(result);
+		//out.println(result);
+		out.flush();
+		out.close();
+		done = true;
 
 		return done;
 	}
