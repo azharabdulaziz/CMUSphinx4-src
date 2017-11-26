@@ -20,7 +20,7 @@ import edu.cmu.sphinx.result.WordResult;
 
 /**
 * 
-* <p/>
+* 
 * Combining lattices requires setting the ID of start and the end of speech nodes, i.e. <s> and </s> respectively,
 * to the same values. This is easily done by making the ID changed directly as a method in its own class.
 * So, the method setId(String newId) is added.   
