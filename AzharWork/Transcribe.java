@@ -21,9 +21,9 @@ import edu.cmu.sphinx.result.WordResult;
 
 public class Transcribe {
 	
-	static String WavePath = "/Users/Azhar/Desktop/Exp1/timit/wav/";
+	static String WavePath = "/Users/Azhar/Desktop/Exp2/an4/wav/an4test_clstk/";
 	//static String fileName = "TEST/DR1/FAKS0/SI2203"; 
-	static String fileName2 = "test/DR4/FEDW0/SI1653"; // He spoke soothingly.
+	static String fileName2 = "fcaw/an406-fcaw-b.sph"; // He spoke soothingly.
 	
 	// Define acoustic models
 	static String ModelsPath = "/Users/Azhar/Desktop/NoisyModels/TIMIT_AM/";

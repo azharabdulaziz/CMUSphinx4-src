@@ -1,21 +1,17 @@
-package AzharTestPackage;
-
+package AzharWork;
+/**
+ * 
+ */
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
-import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.result.WordResult;
 import AzharWork.CombineLattice;
-import AzharWork.LatticeTest;
-import AzharWork.decodeOnce;
 
-public class readLattice {
+public class ps_latticeVote {
 	public static void main(String[] args) throws IOException {
 		String expName = "TIMIT";   // Could be variable
 		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/Results/"; 
@@ -59,7 +55,9 @@ public class readLattice {
 			textResult = textResult + nodeItr.next().getWord()+" ";
 		}
 		
-		System.out.println("Final Text: " + textResult);
+		String finalTextResult = textResult.replace("<s>", "");
+		finalTextResult = finalTextResult.replace("</s>","");
+		System.out.println("Final Text: " + finalTextResult);
 	}
 
 }

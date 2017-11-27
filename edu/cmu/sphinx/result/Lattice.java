@@ -475,7 +475,7 @@ public class Lattice {
      * @throws NumberFormatException
      * @throws IOException
      * @author Azhar Abdulaziz
-     * @from 2017
+     * @since 2017
      */
     public static Lattice readhtk(InputStream stream) throws NumberFormatException, IOException {
         Lattice lattice = new Lattice();
@@ -526,6 +526,10 @@ public class Lattice {
                     wordStr = "<sil>";
                     isFiller = true;
                 }
+                if (wordStr.equals("!SENT_START")) {
+                    wordStr = "<sil>";
+                    isFiller = true;
+                }
                 if (wordStr.startsWith("["))
                     isFiller = true;
                 Word word = new Word(wordStr, new Pronunciation[0], isFiller);
@@ -572,7 +576,7 @@ public class Lattice {
      * @return
      * @throws IOException
      * @author Azhar Abdulaziz
-     * @from 2017
+     * @since 2017
      */
     public static Lattice readhtk(String fileName) throws IOException {
         FileInputStream stream = new FileInputStream(fileName);

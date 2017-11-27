@@ -32,5 +32,28 @@ public class ConfigSetup {
 		
 		return recognizer;
 	}
+	
+public StreamSpeechRecognizer BuildRecognizer(String accModel, String lmModel, String Dict, Configuration config) throws IOException{
+		
+		// Set path to acoustic model.
+		
+		System.out.println("Load Accoustic Mode:" + "file:"+accModel);
+		config.setAcousticModelPath("file:"+accModel);
+		
+		// Set path to dictionary.
+		System.out.println("Load Dictionary:"+ "file:" + Dict);
+		config.setDictionaryPath("file:" + Dict);
+		
+		//Timit LM
+		System.out.println("Load Language Model:" + "file:" + lmModel);
+		config.setLanguageModelPath("file:" + lmModel);
+		
+		System.out.println("Setting Rcognizer");
+		StreamSpeechRecognizer recognizer = new StreamSpeechRecognizer(config);
+		
+		System.out.println("Fnish Setting .... ");
+		
+		return recognizer;
+	}
 
 }
