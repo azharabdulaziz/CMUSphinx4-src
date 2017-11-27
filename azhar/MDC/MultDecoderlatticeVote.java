@@ -1,4 +1,4 @@
-package azhar.MDV;
+package azhar.MDC;
 import java.io.File;
 import java.io.FileWriter;
 /**

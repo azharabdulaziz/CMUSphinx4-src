@@ -1,7 +1,7 @@
 /**
  * 
  */
-package azhar.MDV;
+package azhar.MDC;
 
 import java.util.Collection;
 import java.util.Iterator;
