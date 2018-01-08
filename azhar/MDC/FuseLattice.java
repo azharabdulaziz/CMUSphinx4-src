@@ -41,7 +41,7 @@ public class FuseLattice {
 
 		finalLattice = CombineLattice.CombineNoScale(l5, l6);
 		
-		finalLattice.computeNodePosteriors(0);
+		finalLattice.computeNodePosteriors(1.0f);
 		
 		List<Node> nodes = finalLattice.getViterbiPath();
 		Iterator<Node> nodeItr = nodes.iterator();

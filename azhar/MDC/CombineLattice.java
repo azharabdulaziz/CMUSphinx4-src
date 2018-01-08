@@ -193,8 +193,8 @@ public class CombineLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					accScore = e1.getAcousticScore() + alpha2*CurrentEdge.getAcousticScore();
-					lmScore = e1.getLMScore() + CurrentEdge.getLMScore();
+					accScore = e1.getAcousticScore() - alpha2*CurrentEdge.getAcousticScore();
+					lmScore = e1.getLMScore() - CurrentEdge.getLMScore();
 					
 				}
 				
@@ -253,8 +253,8 @@ public class CombineLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					accScore = e1.getAcousticScore() + CurrentEdge.getAcousticScore();
-					lmScore = e1.getLMScore() + CurrentEdge.getLMScore();
+					accScore = e1.getAcousticScore() - CurrentEdge.getAcousticScore();
+					lmScore = e1.getLMScore() - CurrentEdge.getLMScore();
 					
 				}
 				

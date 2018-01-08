@@ -12,7 +12,7 @@ public class MultDecoderlatticeFusion {
 	 * 
 	 */
 	public static void main(String[] args) throws IOException {
-		String expName = "TIMIT";   // Could be variable
+		String expName = "an4";   // Could be variable
 		String snr = "Results/Clean/" ;  // Should be variable
 		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/";
 		
