@@ -1188,6 +1188,9 @@ public class Lattice {
      * <p>
      * Node posteriors can be retrieved by calling getPosterior() on Node
      * objects.
+     * <p>
+     * The acousticModelWeight is added by Azhar Abdulziz so that noisy multiple AMs could be added later.
+     * @since 2017
      * 
      * @param languageModelWeightAdjustment
      *            the weight multiplier that will be applied to language score
