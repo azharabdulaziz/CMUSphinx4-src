@@ -45,10 +45,10 @@ public class readLattice {
 		Lattice l2 = latIter.next();
 		Lattice l3 = latIter.next();
 		Lattice l4 = latIter.next();
-		Lattice l5 = CombineLattice.Combine(l1, l2);
-		Lattice l6 = CombineLattice.Combine(l3, l4);
+		Lattice l5 = CombineLattice.CombineNoScale(l1, l2);
+		Lattice l6 = CombineLattice.CombineNoScale(l3, l4);
 
-		finalLattice = CombineLattice.Combine(l5, l6);
+		finalLattice = CombineLattice.CombineNoScale(l5, l6);
 		
 		finalLattice.computeNodePosteriors(0);
 		

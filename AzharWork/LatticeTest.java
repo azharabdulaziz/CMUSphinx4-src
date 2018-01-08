@@ -60,12 +60,12 @@ public class LatticeTest {
 
 		// Combine results lattices
 		System.out.println("Combining Two ");
-		Lattice latticeOfTwo = CombineLattice.Combine(lattice1, lattice2);
+		Lattice latticeOfTwo = CombineLattice.CombineNoScale(lattice1, lattice2);
 		System.out.println();
 		
 		System.out.println("Combining Three ");
-		Lattice latticeOfThree = CombineLattice.Combine(lattice1, latticeOfTwo);
-		Lattice latticeOfFive = CombineLattice.Combine(latticeOfThree, latticeOfTwo);		
+		Lattice latticeOfThree = CombineLattice.CombineNoScale(lattice1, latticeOfTwo);
+		Lattice latticeOfFive = CombineLattice.CombineNoScale(latticeOfThree, latticeOfTwo);		
 		//System.out.println("Before Computing Node Posterior.........." );
 		// DisplayLattice(lattice);
 		// Compute posteriori

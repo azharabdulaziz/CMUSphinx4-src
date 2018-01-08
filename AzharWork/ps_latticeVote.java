@@ -1,6 +1,11 @@
 package AzharWork;
 /**
- * 
+ * Pocketsphinx lattice vote, is a test for what pocketsphinx output produces in PocketsphinxPy/MDC_MDV.py.
+ * @paragraph
+ * The steps are: 
+ * 1- For each test utterance, combine the lattices produced by the four AMs 
+ * 2- Estimate the posteriori probability of the comnbined lattice (it is neccesary for the next step)
+ * 3- Retrieve the MAP path using Verbi search.  
  */
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +14,7 @@ import java.util.List;
 
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
+import edu.cmu.sphinx.result.WordResult;
 import AzharWork.CombineLattice;
 
 public class ps_latticeVote {
@@ -30,6 +36,7 @@ public class ps_latticeVote {
 			String testFile = testLattice+AcModel[i]+fileName;
 			System.out.println("Lattice from: " + testFile);
 			Lattice lattice = Lattice.readhtk(testFile);
+			ShowWordScores(lattice);
 			lattices.add(lattice);
 		}
 		
@@ -41,11 +48,27 @@ public class ps_latticeVote {
 		Lattice l2 = latIter.next();
 		Lattice l3 = latIter.next();
 		Lattice l4 = latIter.next();
-		Lattice l5 = CombineLattice.Combine(l1, l2);
-		Lattice l6 = CombineLattice.Combine(l3, l4);
+		Lattice l5 = CombineLattice.CombineNoScale(l1, l2);
+		Lattice l6 = CombineLattice.CombineNoScale(l3, l4);
 
-		finalLattice = CombineLattice.Combine(l5, l6);
+		finalLattice = CombineLattice.CombineNoScale(l5, l6);
 		
+		String finalTextResult = getFinalResultNoFiller(finalLattice);
+		System.out.println();
+		System.out.println("Show Fused lattice word scores: ");
+		ShowWordScores(finalLattice);
+		System.out.println();
+		System.out.println("Final Text: " + finalTextResult);
+	}
+
+	
+	/**
+	 * 
+	 * @param finalLattice
+	 * @return
+	 */
+private static String getFinalResultNoFiller(Lattice finalLattice) {
+		// TODO Auto-generated method stub
 		finalLattice.computeNodePosteriors(0);
 		
 		List<Node> nodes = finalLattice.getViterbiPath();
@@ -57,7 +80,24 @@ public class ps_latticeVote {
 		
 		String finalTextResult = textResult.replace("<s>", "");
 		finalTextResult = finalTextResult.replace("</s>","");
-		System.out.println("Final Text: " + finalTextResult);
+		return finalTextResult;
+	}
+
+	/**
+	 * 
+	 * @param lattice
+	 */
+	private static void ShowWordScores(Lattice lattice) {
+		// TODO Auto-generated method stub
+		lattice.computeNodePosteriors(0);
+		List<WordResult> wr = lattice.getWordResultPath();
+		Iterator<WordResult> word_iterator = wr.iterator();
+		
+		while(word_iterator.hasNext()) {
+			WordResult x = word_iterator.next();
+			System.out.println("Score of word('"+ x.getWord()  + "'): " + x.getScore());
+			
+		}
 	}
 
 }

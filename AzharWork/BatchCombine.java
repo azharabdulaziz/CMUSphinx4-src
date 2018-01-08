@@ -142,9 +142,9 @@ public class BatchCombine {
 
 
 		// New combined results
-		Lattice lattice1 = CombineLattice.Combine(latticeClean, lattice20dB);
-		Lattice lattice2 = CombineLattice.Combine(lattice10dB, lattice15dB);
-		Lattice new_lattice = CombineLattice.Combine(lattice1, lattice2);
+		Lattice lattice1 = CombineLattice.CombineNoScale(latticeClean, lattice20dB);
+		Lattice lattice2 = CombineLattice.CombineNoScale(lattice10dB, lattice15dB);
+		Lattice new_lattice = CombineLattice.CombineNoScale(lattice1, lattice2);
 		// Compute posteriori, it is required
 		new_lattice.computeNodePosteriors(1.0f); 
 

@@ -75,7 +75,7 @@ public class LatticeCombination {
 	    	System.out.println("Result from AM_15dB is:" + result15dB.getResult());
 	    	
 	    	// New combined results
-	    	Lattice new_lattice = CombineLattice.Combine(lattice10dB, lattice15dB);
+	    	Lattice new_lattice = CombineLattice.CombineNoScale(lattice10dB, lattice15dB);
 	    	new_lattice.computeNodePosteriors(1.0f); 
 	 
 	   // get textual utterance after combining

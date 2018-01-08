@@ -1,21 +1,19 @@
 package azhar.MDC;
+
 import java.io.File;
 import java.io.FileWriter;
-/**
- * 
- */
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import edu.cmu.sphinx.result.Lattice;
 
-
-public class MultDecoderlatticeVote {
-	public static void main(String[] args) throws IOException {
-		String expName = "an4";   // Could be variable
-		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/"; 
-		String snr = "Results/Clean/" ;  // Should be variable
+public class BatchMultiLattFusion {
+	public ArrayList<String> Start(String expName, String snr, String baseDir)  throws IOException{
+		//String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/"; 
+		String outFile = baseDir +snr +"MDLFusing.txt";
+		String FusionTimeOutFile = baseDir +snr +"MDLFusingTime.csv";
 		String noiseType = "_";
 		if(expName.equalsIgnoreCase("an4")) {
 			noiseType = "_White";
@@ -26,7 +24,7 @@ public class MultDecoderlatticeVote {
 		String accModel4 = expName +noiseType + "20dB.cd_cont_200/Lattice/";
 		String[] AcModel = {accModel1, accModel2,accModel3,accModel4};
 		
-		String outFile = baseDir +snr +"MDLFusing.txt";
+		
 		//PrintWriter out = new PrintWriter(outFile);
 		
 		// Read Lattices and store them to ArrayList<Lattice>
@@ -35,9 +33,10 @@ public class MultDecoderlatticeVote {
 		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(new File(baseDir + TestFileIds));
 		ArrayList<String> FinalResult =new ArrayList<String>(); 
-		int count=0;
+		ArrayList<String> TimeInMilli = new ArrayList<String>();
+		//int count=0;
 		while(scan.hasNextLine()) {
-			count++;
+			//count++;
 			String fileName="";
 			String uttId = "";
 			String relPath = scan.nextLine();
@@ -67,22 +66,39 @@ public class MultDecoderlatticeVote {
 			}
 			
 			// Combine lattices
-			String hyp = FuseLattice.getFusedResutl(lattices);
+			long StartTime = System.nanoTime();
+			String hyp = FuseLattice.getFusedResutlNoScaleAM(lattices);
+			long EndTime = System.nanoTime();
+			// Estimate elapsed time for attice fusion
+			long FusionDuration = EndTime - StartTime;
+			long TimeMS = TimeUnit.NANOSECONDS.toMillis(FusionDuration);
+			String TimeInfo = fileName +","+ TimeMS+"\n";
+			//System.out.println("Fusion Processing time: " + TimeInfo);
+			TimeInMilli.add(TimeInfo);
 			
+			// store results
 			hyp = hyp+" (" + uttId + ")\n";
 			FinalResult.add(hyp);
 			//System.out.println(hyp);
 			//StoreTextResult(hyp, out);
 			System.out.print("*");
 			
+			
 		}
+		
+		System.out.println();
+		System.out.println("Store decoded text results in: " + outFile); 
+		System.out.println("Store fusion procesing time in: " + FusionTimeOutFile);
 		System.out.println();
 		//System.out.println(FinalResult);
+		// Store decoding results
 		StoreTextResult(FinalResult, outFile);
 		
-		Runtime.getRuntime().exec("/usr/bin/perl /src/azhar/MDV/word_align.pl");
-	}
+		//Store fusion processing time results
+		StoreTextResult(TimeInMilli, FusionTimeOutFile);
 
+		return FinalResult;
+	}
 
 	/**
 	 *  
@@ -100,6 +116,5 @@ public class MultDecoderlatticeVote {
 		writer.close();
 		
 	}
-
 
 }
