@@ -21,10 +21,12 @@ import java.net.MalformedURLException;
 import edu.cmu.sphinx.frontend.frequencywarp.MelFrequencyFilterBank2;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.linguist.acoustic.tiedstate.Loader;
+import edu.cmu.sphinx.linguist.language.ngram.LanguageModel;
 import edu.cmu.sphinx.util.TimeFrame;
 import edu.cmu.sphinx.util.Utilities;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
+import edu.cmu.sphinx.util.props.PropertySheet;
 
 
 /**
@@ -160,7 +162,8 @@ public class Context {
         }
         //search manager for LVCSR is set by deafult
     }
-
+    
+    
 
     public void setSpeechSource(InputStream stream, TimeFrame timeFrame) {
         getInstance(StreamDataSource.class).setInputStream(stream, timeFrame);
@@ -191,6 +194,7 @@ public class Context {
         setProperty(configurationManager, name, value.toString());
     }
 
+    
     /**
      * Sets property of a top-level "property" tag.
      *

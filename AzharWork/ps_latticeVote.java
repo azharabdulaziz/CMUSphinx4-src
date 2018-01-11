@@ -8,11 +8,16 @@ package AzharWork;
  * 3- Retrieve the MAP path using Verbi search.  
  */
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.cmu.sphinx.api.Configuration;
+import edu.cmu.sphinx.api.Context;
+import edu.cmu.sphinx.linguist.language.ngram.LanguageModel;
 import edu.cmu.sphinx.result.Lattice;
+import edu.cmu.sphinx.result.LatticeRescorer;
 import edu.cmu.sphinx.result.Node;
 import edu.cmu.sphinx.result.WordResult;
 import AzharWork.CombineLattice;
@@ -20,7 +25,10 @@ import AzharWork.CombineLattice;
 public class ps_latticeVote {
 	public static void main(String[] args) throws IOException {
 		String expName = "TIMIT";   // Could be variable
-		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/Results/"; 
+		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName +"/";
+		
+		//Common In itialization
+		String LatticeBaseDir = baseDir + "Results/";
 		String snr = "Clean/" ;  // Should be variable
 		String accModel1 = "TIMIT_Clean.cd_cont_200/Lattice/";
 		String accModel2 = "TIMIT_10dB.cd_cont_200/Lattice/";
@@ -28,40 +36,127 @@ public class ps_latticeVote {
 		String accModel4 = "TIMIT_20dB.cd_cont_200/Lattice/";
 		String[] AcModel = {accModel1, accModel2,accModel3,accModel4};
 		
-		String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable 
-		// Read Lattices and store them to ArrayList<Lattice>
-		String testLattice = baseDir + snr;
-		ArrayList<Lattice> lattices = new ArrayList<Lattice> ();
-		for(int i= 0; i<4; i++) {
-			String testFile = testLattice+AcModel[i]+fileName;
-			System.out.println("Lattice from: " + testFile);
-			Lattice lattice = Lattice.readhtk(testFile);
-			ShowWordScores(lattice);
-			lattices.add(lattice);
-		}
+		// Initialize configuration to get LanguageModel class from configuration. This will be used in LatticeRescorer
+		String LMPath = baseDir + "TIMIT_Models/TIMIT_test.lm";
+		String DictPath = baseDir + "TIMIT_Models/";
+		String AMPath = baseDir + "TIMIT_Models/timit_Clean.cd_cont_200/"; 
+		// get configuration values
 		
-		// Combine lattices
-		Lattice finalLattice = new Lattice();
+		LanguageModel langModel= getLnguageModel(AMPath,LMPath,DictPath); 
+		
+		
+		//System.out.println("Current Language Model path: " + config.getLanguageModelPath());
+		System.out.println("Current Language Model: " + langModel.toString());
+		
+		String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable
+		
+		
+		ArrayList<Lattice> lattices = ReadNoisyModelLattices(LatticeBaseDir, fileName,AcModel,snr);
+		
 		Iterator<Lattice> latIter = lattices.iterator();
-
 		Lattice l1 = latIter.next();
 		Lattice l2 = latIter.next();
 		Lattice l3 = latIter.next();
 		Lattice l4 = latIter.next();
-		Lattice l5 = CombineLattice.CombineNoScale(l1, l2);
-		Lattice l6 = CombineLattice.CombineNoScale(l3, l4);
-
-		finalLattice = CombineLattice.CombineNoScale(l5, l6);
 		
-		String finalTextResult = getFinalResultNoFiller(finalLattice);
+		System.out.println("Before LM rescore: ");
+		ResultAnalysis.AllPossiblePaths(l1);
 		System.out.println();
-		System.out.println("Show Fused lattice word scores: ");
-		ShowWordScores(finalLattice);
+		Lattice lmRescoredLattice = getLangModelScoredLattice(l1,langModel);
 		System.out.println();
-		System.out.println("Final Text: " + finalTextResult);
+		System.out.println("After LM rescore....");
+		ResultAnalysis.AllPossiblePaths(lmRescoredLattice);
+		
+		
+		
+//		Lattice finalLattice = CombineModels(lattices);
+//		String finalTextResult = getFinalResultNoFiller(finalLattice);
+//		System.out.println();
+//		System.out.println("Show Fused lattice word scores: ");
+//		ShowWordScores(finalLattice);
+//		System.out.println();
+//		System.out.println("Final Text: " + finalTextResult);
+	}
+
+	/**
+	 * 
+	 * @param lattices
+	 * @param langModel 
+	 * @return
+	 */
+	private static Lattice getLangModelScoredLattice(Lattice lattice, LanguageModel langModel) {
+		// TODO Auto-generated method stub
+		Lattice rescoredLattice = new Lattice();
+		LatticeRescorer rescoredLattice1 = new LatticeRescorer(lattice,langModel);
+		rescoredLattice = rescoredLattice1.getRescoredLattice();
+		
+		return rescoredLattice ;
 	}
 
 	
+	/**
+	 * 
+	 * @param acousticModelPath
+	 * @param lmPath
+	 * @param dictPath
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
+	private static LanguageModel getLnguageModel(String acousticModelPath, String lmPath, String dictPath) throws MalformedURLException, IOException {
+		// TODO Auto-generated method stub
+		Configuration config = new Configuration();
+		config.setLanguageModelPath(lmPath);
+		config.setAcousticModelPath(acousticModelPath);
+		config.setDictionaryPath(dictPath );
+		Context context = new Context(config);
+		LanguageModel langModel = context.getInstance(LanguageModel.class);
+	
+		return langModel;
+	}
+
+
+	private static Lattice CombineModels(ArrayList<Lattice> lattices) {
+		// Combine lattices
+				Lattice finalLattice = new Lattice();
+				Iterator<Lattice> latIter = lattices.iterator();
+				Lattice l1 = latIter.next();
+				Lattice l2 = latIter.next();
+				Lattice l3 = latIter.next();
+				Lattice l4 = latIter.next();
+			
+			
+				//LatticeRescorer y = new LatticeRescorer(l1, x );
+			
+				Lattice l5 = CombineLattice.CombineNoScale(l1, l2);
+				Lattice l6 = CombineLattice.CombineNoScale(l3, l4);
+
+				finalLattice = CombineLattice.CombineNoScale(l5, l6);
+		return finalLattice;
+	}
+
+
+	private static ArrayList<Lattice> ReadNoisyModelLattices(String baseDir, String fileName, String[] AcModel,String snr) throws IOException {
+		// Read Lattices and store them to ArrayList<Lattice>
+				String testLattice = baseDir + snr;
+				ArrayList<Lattice> lattices = new ArrayList<Lattice> ();
+				for(int i= 0; i<4; i++) {
+					String testFile = testLattice+AcModel[i]+fileName;
+					System.out.println("Lattice from: " + testFile);
+					Lattice lattice = Lattice.readhtk(testFile);
+					ShowWordScores(lattice);
+					lattices.add(lattice);
+				}
+				
+		
+		
+		return lattices;
+	}
+
+
+	
+
+
 	/**
 	 * 
 	 * @param finalLattice

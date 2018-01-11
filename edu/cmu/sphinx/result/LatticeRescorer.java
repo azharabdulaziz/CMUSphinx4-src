@@ -41,8 +41,8 @@ public class LatticeRescorer {
         this.model = model;
         depth = model.getMaxDepth();
     }
-
-
+    
+    
     private void rescoreEdges() {
         for (Edge edge : lattice.edges) {
 
@@ -90,5 +90,19 @@ public class LatticeRescorer {
 
     public void rescore() {
         rescoreEdges();
+    }
+    
+    /**
+     * This method is added by Azhar Abdulaziz 2018
+     * It is used to get the lattice after it is scored. Note this method already calls {@link rescore()}, 
+     * so, there is no need to call rescore() again.  
+     * @return
+     * 
+     * @author Azhar Sabah Abdulaziz
+     * @since 2018
+     */
+    public Lattice getRescoredLattice() {
+    	rescoreEdges();
+    	return this.lattice;
     }
 }

@@ -8,12 +8,16 @@ import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.decoder.search.ActiveList;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.linguist.dictionary.Word;
+import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
 import edu.cmu.sphinx.result.WordResult;
 
 public class ResultAnalysis {
 
-	
+	/**
+	 * 
+	 * @param result
+	 */
 	public static void Word_analysis(SpeechResult result){
 		// Words Analysis
 		System.out.println("..........Word General Analysis..............");
@@ -29,6 +33,10 @@ public class ResultAnalysis {
 	}
 	
 	
+	/**
+	 * 
+	 * @param result
+	 */
 	public static void getWordScore(SpeechResult result){
 		// Words Analysis
 		double acc = 0;
@@ -43,6 +51,11 @@ public class ResultAnalysis {
     	System.out.println("Total Score = " + acc);
 	}
 	
+	/**
+	 * 
+	 * @param result
+	 * @return
+	 */
 	public static double getTotalWordScore(SpeechResult result){
 		// Total Words Score
 		double acc=0;
@@ -57,6 +70,13 @@ public class ResultAnalysis {
     	return acc;
 	}
 	
+	
+	/**
+	 * 
+	 * @param result
+	 * @return
+	 */
+	
 	public static List<String> AllPossiblePaths(SpeechResult result){
 		System.out.println("......... All Possible Paths ..........");
 		List<String> allPaths = result.getLattice().allPaths();
@@ -69,7 +89,70 @@ public class ResultAnalysis {
 
 	}
 	
-	public static void Node_analysis(SpeechResult result){
+	
+	
+	/**
+	 * 
+	 * @param lattice
+	 * @return
+	 */
+	public static List<String> AllPossiblePaths(Lattice lattice){
+		System.out.println("......... All Possible Paths ..........");
+		List<String> allPaths = lattice.allPaths();
+		for(int i=0; i< allPaths.size(); i++){
+			System.out.println("Path(" + i + "): " + allPaths.get(i));
+			
+		}
+		
+		return(allPaths);
+
+	}
+	
+	/**
+	 * 
+	 * @param lattice
+	 */
+	
+	public static void Node_analysis(Lattice lattice){
+		//Lattice Nodes
+		System.out.println("............Lattice Nodes Analysis ......");
+		System.out.println("--------------- Nodes Statistics -------------------------");
+		Collection<Node> nodes = lattice.getNodes();
+		System.out.println("No. of nodes for this lattice is: " + nodes.size());
+    	Iterator<Node> node = nodes.iterator();
+    	int ind=0;
+    	while(node.hasNext()){
+    		Node current_node = node.next();
+    		
+    		System.out.println("--- Node:" + current_node.getWord()+"---");
+    		System.out.println("--- Node ID:" + current_node.getId()+ "---");
+    		
+    		System.out.println("Forward Score of Node(" + ind + ") = " + current_node.getForwardScore());
+    		System.out.println("Backward Score of Node(" + ind + ") = "
+					+ current_node.getBackwardScore());
+    		double posteriori_pro = current_node.getPosterior();
+    		System.out.println("Posteriori Probability of Node(" +ind + ") = " + posteriori_pro);
+    		System.out.println(
+					"Begin Time of Node(" + ind + ") = " + current_node.getBeginTime());
+    		System.out.println(
+					"End Time of Node(" + ind + ") = " + current_node.getEndTime());
+    		
+    		System.out.println(
+					"Viterbi Score of Node(" + ind + ") = " + current_node.getViterbiScore());
+    		
+    		System.out.println("-----------------------------------------------------");
+    		
+    		
+    		ind=ind+1;
+    	}
+       	System.out.println("^^^^^^^^^^^^^^ End Tokens Analysis ^^^^^^^^^^^^^^^^^");
+	}
+	
+	/**
+	 * 
+	 * @param result
+	 */
+   public static void Node_analysis(SpeechResult result){
 		//Lattice Nodes
 		System.out.println("............Lattice Nodes Analysis ......");
 		System.out.println("--------------- Nodes Statistics -------------------------");
