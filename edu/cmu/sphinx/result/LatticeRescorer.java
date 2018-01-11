@@ -28,6 +28,10 @@ public class LatticeRescorer {
     protected final Lattice lattice;
     protected final LanguageModel model;
     private int depth;
+    /**
+     * Azhar: Why languageWeight is Fixed!
+     * Azhar: I added another constructor in Jan 2018 with variable lm weight 
+     */
     private float languageWeigth = 8.0f;
 
     /**
@@ -35,10 +39,29 @@ public class LatticeRescorer {
      * 
      * @param lattice lattice to rescore
      * @param model language model to rescore
+     * 
      */
     public LatticeRescorer(Lattice lattice, LanguageModel model) {
         this.lattice = lattice;
         this.model = model;
+        this.languageWeigth = 8.0f;
+        depth = model.getMaxDepth();
+    }
+    
+    /**
+     * This constructor enables choosing languageWeight 
+     * @param lattice
+     * @param model
+     * @param lmWeight
+     * 
+     * @author Azhar Sabah Abdulaziz
+     * @since
+     */
+    
+    public LatticeRescorer(Lattice lattice, LanguageModel model, float lmWeight) {
+        this.lattice = lattice;
+        this.model = model;
+        this.languageWeigth = lmWeight;
         depth = model.getMaxDepth();
     }
     

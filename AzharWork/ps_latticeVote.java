@@ -10,12 +10,16 @@ package AzharWork;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.Context;
+import edu.cmu.sphinx.linguist.WordSequence;
+import edu.cmu.sphinx.linguist.dictionary.Word;
 import edu.cmu.sphinx.linguist.language.ngram.LanguageModel;
+import edu.cmu.sphinx.result.Edge;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.LatticeRescorer;
 import edu.cmu.sphinx.result.Node;
@@ -35,47 +39,32 @@ public class ps_latticeVote {
 		String accModel3 = "TIMIT_15dB.cd_cont_200/Lattice/";
 		String accModel4 = "TIMIT_20dB.cd_cont_200/Lattice/";
 		String[] AcModel = {accModel1, accModel2,accModel3,accModel4};
+		String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable
 		
+		//Lattice l1 = ReadSingleModelLattices(LatticeBaseDir, fileName, accModel1, snr);
+		//l1.dumpDot("l1.dot", getFinalResultNoFiller(l1));
 		// Initialize configuration to get LanguageModel class from configuration. This will be used in LatticeRescorer
-		String LMPath = baseDir + "TIMIT_Models/TIMIT_test.lm";
-		String DictPath = baseDir + "TIMIT_Models/";
-		String AMPath = baseDir + "TIMIT_Models/timit_Clean.cd_cont_200/"; 
+/*				String LMPath = baseDir + "TIMIT_Models/TIMIT_test.lm.dmp";
+				String DictPath = baseDir + "TIMIT_Models/";
+				String AMPath = baseDir + "TIMIT_Models/timit_Clean.cd_cont_200/";
+*/				
+				
 		// get configuration values
-		
-		LanguageModel langModel= getLnguageModel(AMPath,LMPath,DictPath); 
-		
-		
+		/*LanguageModel langModel= getLnguageModel(AMPath,LMPath,DictPath); 
+		System.out.println("LM Max Depth: " + langModel.getMaxDepth());
+		//System.out.println("Vocab:  " + langModel.getVocabulary());
 		//System.out.println("Current Language Model path: " + config.getLanguageModelPath());
 		System.out.println("Current Language Model: " + langModel.toString());
 		
-		String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable
-		
-		
+		*/
 		ArrayList<Lattice> lattices = ReadNoisyModelLattices(LatticeBaseDir, fileName,AcModel,snr);
-		
-		Iterator<Lattice> latIter = lattices.iterator();
-		Lattice l1 = latIter.next();
-		Lattice l2 = latIter.next();
-		Lattice l3 = latIter.next();
-		Lattice l4 = latIter.next();
-		
-		System.out.println("Before LM rescore: ");
-		ResultAnalysis.AllPossiblePaths(l1);
+		Lattice finalLattice = CombineModels(lattices);
+		String finalTextResult = getFinalResultNoFiller(finalLattice);
 		System.out.println();
-		Lattice lmRescoredLattice = getLangModelScoredLattice(l1,langModel);
+		System.out.println("Show Fused lattice word scores: ");
+		ShowWordScores(finalLattice);
 		System.out.println();
-		System.out.println("After LM rescore....");
-		ResultAnalysis.AllPossiblePaths(lmRescoredLattice);
-		
-		
-		
-//		Lattice finalLattice = CombineModels(lattices);
-//		String finalTextResult = getFinalResultNoFiller(finalLattice);
-//		System.out.println();
-//		System.out.println("Show Fused lattice word scores: ");
-//		ShowWordScores(finalLattice);
-//		System.out.println();
-//		System.out.println("Final Text: " + finalTextResult);
+		System.out.println("Final Text: " + finalTextResult);
 	}
 
 	/**
@@ -103,15 +92,18 @@ public class ps_latticeVote {
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 */
-	private static LanguageModel getLnguageModel(String acousticModelPath, String lmPath, String dictPath) throws MalformedURLException, IOException {
+	private static LanguageModel getLnguageModel(String acousticModelPath, String lmPath, String dictPath) throws MalformedURLException, IOException  {
 		// TODO Auto-generated method stub
 		Configuration config = new Configuration();
 		config.setLanguageModelPath(lmPath);
 		config.setAcousticModelPath(acousticModelPath);
 		config.setDictionaryPath(dictPath );
+		
 		Context context = new Context(config);
+		
+		//String path = config.getLanguageModelPath();
+		context.setLanguageModel(lmPath);
 		LanguageModel langModel = context.getInstance(LanguageModel.class);
-	
 		return langModel;
 	}
 
@@ -152,6 +144,16 @@ public class ps_latticeVote {
 		
 		return lattices;
 	}
+	
+	
+	private static Lattice ReadSingleModelLattices(String baseDir, String fileName, String AcModel,String snr) throws IOException {
+		// Read Lattices and store them to ArrayList<Lattice>
+				String testLattice = baseDir + snr;
+				String testFile = testLattice+AcModel+fileName;
+				Lattice lattice = Lattice.readhtk(testFile);
+			    System.out.println("Lattice from: " + testFile);
+				return lattice;
+	}
 
 
 	
@@ -191,6 +193,18 @@ private static String getFinalResultNoFiller(Lattice finalLattice) {
 		while(word_iterator.hasNext()) {
 			WordResult x = word_iterator.next();
 			System.out.println("Score of word('"+ x.getWord()  + "'): " + x.getScore());
+			
+		}
+	}
+	
+	private static void ShowEdgeScores(Lattice lattice) {
+		// TODO Auto-generated method stub
+		lattice.computeNodePosteriors(0);
+		Collection<Edge> edges = lattice.getEdges();
+		Iterator<Edge> edgeIterator = edges.iterator();
+		while(edgeIterator.hasNext()) {
+			Edge x = edgeIterator.next();
+			System.out.println("LM Score of word(''): " + x.getLMScore());
 			
 		}
 	}

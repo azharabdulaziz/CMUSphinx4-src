@@ -550,7 +550,8 @@ public class Lattice {
                 String fromId = parts[1].substring(2);
                 String toId = parts[2].substring(2);
                 double ascore = Double.parseDouble(parts[3].substring(2));
-                double lscore = Double.parseDouble(parts[4].substring(2)) * lmscale;
+                //double lscore = Double.parseDouble(parts[4].substring(2)) * lmscale;
+                double lscore = LogMath.LOG_ZERO * lmscale;
                 lattice.addEdge(lattice.nodes.get(fromId), lattice.nodes.get(toId), ascore, lscore);
             } else {
                 // reading header here if needed
