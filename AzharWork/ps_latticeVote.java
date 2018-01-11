@@ -39,7 +39,8 @@ public class ps_latticeVote {
 		String accModel3 = "TIMIT_15dB.cd_cont_200/Lattice/";
 		String accModel4 = "TIMIT_20dB.cd_cont_200/Lattice/";
 		String[] AcModel = {accModel1, accModel2,accModel3,accModel4};
-		String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable
+		//String fileName = "test-DR4-FEDW0-SI1653.htk"; // Will be variable
+		String fileName ="test-DR1-FAKS0-SA1.htk";
 		
 		//Lattice l1 = ReadSingleModelLattices(LatticeBaseDir, fileName, accModel1, snr);
 		//l1.dumpDot("l1.dot", getFinalResultNoFiller(l1));

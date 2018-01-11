@@ -10,6 +10,7 @@ import java.util.Iterator;
 import edu.cmu.sphinx.result.Edge;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
+import edu.cmu.sphinx.util.LogMath;
 
 /**
  * <p>
@@ -194,8 +195,13 @@ public class CombineLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					accScore = e1.getAcousticScore() + alpha2*CurrentEdge.getAcousticScore();
-					lmScore = e1.getLMScore() + CurrentEdge.getLMScore();
+					
+					LogMath x = LogMath.getLogMath();
+					float scaled = (float) (CurrentEdge.getAcousticScore()*alpha2);
+					accScore = x.addAsLinear((float)e1.getAcousticScore(), scaled );
+					lmScore = x.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
+					//accScore = e1.getAcousticScore() + alpha2*CurrentEdge.getAcousticScore();
+					//lmScore = e1.getLMScore() + CurrentEdge.getLMScore();
 					
 				}
 				
@@ -254,8 +260,13 @@ public class CombineLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					accScore = e1.getAcousticScore() - CurrentEdge.getAcousticScore();
-					lmScore = e1.getLMScore() - CurrentEdge.getLMScore();
+					LogMath x = LogMath.getLogMath();
+					float scaled = (float) (CurrentEdge.getAcousticScore());
+					accScore = x.addAsLinear((float)e1.getAcousticScore(), scaled );
+					lmScore = x.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
+					
+					//accScore = e1.getAcousticScore() - CurrentEdge.getAcousticScore();
+					//lmScore = e1.getLMScore() - CurrentEdge.getLMScore();
 					
 				}
 				
