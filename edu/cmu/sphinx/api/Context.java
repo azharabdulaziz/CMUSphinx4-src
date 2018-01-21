@@ -17,6 +17,11 @@ import static edu.cmu.sphinx.util.props.ConfigurationManagerUtils.setProperty;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import edu.cmu.sphinx.frontend.frequencywarp.MelFrequencyFilterBank2;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
@@ -164,8 +169,185 @@ public class Context {
     }
     
     
+    public String getLanguageModel() {
+    	String lmPath = getLocalProperty("largeTrigramModel->location");
+        /*if (path.endsWith(".lm")) {
+            setLocalProperty("simpleNGramModel->location", path);
+            setLocalProperty(
+                "lexTreeLinguist->languageModel", "simpleNGramModel");
+        } else if (path.endsWith(".dmp")) {
+            setLocalProperty("largeTrigramModel->location", path);
+            setLocalProperty(
+                "lexTreeLinguist->languageModel", "largeTrigramModel");
+        } else if (path.endsWith(".bin")) {
+            setLocalProperty("trieNgramModel->location", path);
+            setLocalProperty(
+                "lexTreeLinguist->languageModel", "trieNgramModel");
+        } else {
+            throw new IllegalArgumentException(
+                "Unknown format extension: " + path);
+        }*/
+        //search manager for LVCSR is set by deafult
+        return lmPath;
+    }
+    
 
-    public void setSpeechSource(InputStream stream, TimeFrame timeFrame) {
+private String getLocalProperty(String string) {
+		
+		String properyValue  = getProperty(string);
+		return properyValue;
+	}
+
+/**
+ * 
+ * @param string
+ * @return
+ * @author Azhar Sabah Abdulaziz
+ * 
+ */
+
+/**
+ * Attempts to get the value of a component-property. If the property-name is ambiguous  with respect to
+ * the given <code>ConfiguratioManager</code> an extended syntax (componentName-&gt;propName) can be used to access the
+ * property.
+ * <p>
+ * @param cm
+ * @param propName
+ * @param propValue
+ * @author Azhar Sabah Abdulaziz
+ * @since 2018
+ */
+private String getProperty(String propName) {
+    //assert propValue != null;
+	
+    Map<String, List<PropertySheet>> allProps = listAllsPropNames(configurationManager);
+    Set<String> configurableNames = configurationManager.getComponentNames();
+
+    if (!allProps.containsKey(propName) && !propName.contains("->") && !configurableNames.contains(propName))
+        throw new RuntimeException("No property '" + propName + "' in configuration '" + configurationManager.getConfigURL() + "'!");
+
+    // if a configurable-class should be modified
+   /* if (configurableNames.contains(propName)) {
+        try {
+            final Class<? extends Configurable> confClass = Class.forName(propValue).asSubclass(Configurable.class);
+            ConfigurationManagerUtils.setClass(cm.getPropertySheet(propName), confClass);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return;
+    }
+
+    if (!propName.contains("->") && allProps.get(propName).size() > 1) {
+        throw new RuntimeException("Property-name '" + propName + "' is ambiguous with respect to configuration '"
+                + cm.getConfigURL() + "'. Use 'componentName->propName' to disambiguate your request.");
+    }
+*/
+    String componentName;
+
+    // if disambiguation syntax is used find the correct PS first
+    if (propName.contains("->")) {
+        String[] splitProp = propName.split("->");
+        componentName = splitProp[0];
+        propName = splitProp[1];
+    } else {
+        componentName = allProps.get(propName).get(0).getInstanceName();
+    }
+
+    String PropertyValue = getPropValue(componentName, propName);
+    return PropertyValue;
+}
+
+/**
+ * 
+ * @param cm
+ * @param componentName
+ * @param propName
+ * @return
+ * 
+ * @author Azhar Sabhah Abdulaziz
+ * @since 2018
+ */
+private String getPropValue(String componentName, String propName) {
+
+	// now get the property
+    PropertySheet ps = configurationManager.getPropertySheet(componentName);
+    if (ps == null)
+        throw new RuntimeException("Component '" + propName + "' is not registered to this system configuration '");
+    String propValue = null;
+    switch (ps.getType(propName)) {
+        case BOOLEAN:
+        	
+        		propValue = ps.getBoolean(propName).toString();
+            //ps.setBoolean(propName, Boolean.valueOf(propValue));
+            break;
+        case DOUBLE:
+        		propValue = Double.toString(ps.getDouble(propName)); 
+            //ps.setDouble(propName, new Double(propValue));
+            break;
+        case INT:
+        		propValue = Integer.toString(ps.getInt(propName));
+            //ps.setInt(propName, new Integer(propValue));
+            break;
+        case STRING:
+        		propValue = ps.getString(propName);
+            //ps.setString(propName, propValue);
+            break;
+        case COMPONENT:
+        		propValue = ps.getComponent(propName).toString();
+            //ps.setComponent(propName, propValue, null);
+            break;
+        /*case COMPONENT_LIST:
+        	
+            List<String> compNames = new ArrayList<String>();
+            for (String component : propValue.split(";")) {
+                compNames.add(component.trim());
+            }
+
+            ps.setComponentList(propName, compNames, null);
+            break;
+*/            
+            default:
+            throw new RuntimeException("unknown property-type");
+    }
+    
+    return propValue;
+	
+}
+
+
+
+/**
+ * Returns a map of all component-properties of this config-manager (including their associated property-sheets.
+ * 
+ * @param cm configuration manager
+ * @return map with properties
+ */
+private static Map<String, List<PropertySheet>> listAllsPropNames(ConfigurationManager cm) {
+    Map<String, List<PropertySheet>> allProps = new HashMap<String, List<PropertySheet>>();
+
+    for (String configName : cm.getComponentNames()) {
+        PropertySheet ps = cm.getPropertySheet(configName);
+
+        for (String propName : ps.getRegisteredProperties()) {
+            if (!allProps.containsKey(propName))
+                allProps.put(propName, new ArrayList<PropertySheet>());
+
+            allProps.get(propName).add(ps);
+        }
+    }
+
+    return allProps;
+}
+
+    /*public String getLocalProperty(String name) {
+		// TODO Auto-generated method stub
+    configurationManager.getPropertySheet();
+    	getProperty(configurationManager, name);
+		return null;
+	}
+*/
+	public void setSpeechSource(InputStream stream, TimeFrame timeFrame) {
         getInstance(StreamDataSource.class).setInputStream(stream, timeFrame);
         setLocalProperty("trivialScorer->frontend", "liveFrontEnd");
     }

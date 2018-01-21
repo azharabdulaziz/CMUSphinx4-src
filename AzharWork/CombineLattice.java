@@ -260,11 +260,11 @@ public class CombineLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					LogMath x = LogMath.getLogMath();
+					LogMath lohMath = LogMath.getLogMath();
 					float scaled = (float) (CurrentEdge.getAcousticScore());
-					accScore = x.addAsLinear((float)e1.getAcousticScore(), scaled );
-					lmScore = x.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
-					
+					accScore = lohMath.addAsLinear((float)e1.getAcousticScore(), scaled );
+					lmScore = lohMath.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
+				
 					//accScore = e1.getAcousticScore() - CurrentEdge.getAcousticScore();
 					//lmScore = e1.getLMScore() - CurrentEdge.getLMScore();
 					

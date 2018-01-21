@@ -350,7 +350,6 @@ public class NgramTrieModel implements LanguageModel {
 
         if (numberWords == maxDepth) {
             Float probability = ngramProbCache.get(wordSequence);
-
             if (probability != null) {
                 ngramHits++;
                 return probability;

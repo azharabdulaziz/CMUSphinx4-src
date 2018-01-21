@@ -35,10 +35,10 @@ public class BinaryStreamLoader extends BinaryLoader {
             float languageWeight, double wip,
             float unigramWeight)
         throws IOException
-    {
+    {	
         super(format, applyLanguageWeightAndWip, languageWeight, wip,
                 unigramWeight);
-        
+        System.out.println("From BinaryStreamLoader Line 41: LM Path is: " + location.getPath());
         InputStream stream = location.openStream();
         loadModelLayout(stream);
         

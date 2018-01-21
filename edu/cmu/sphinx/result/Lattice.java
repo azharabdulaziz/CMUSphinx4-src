@@ -469,7 +469,8 @@ public class Lattice {
     }
 
     /**
-     * 
+     * This method will set lmscore to zero.
+     * <p>
      * @param stream
      * @return
      * @throws NumberFormatException
@@ -485,7 +486,7 @@ public class Lattice {
         boolean readingEdges = false;
         int startIdx = 0;
         int endIdx = 1;
-        double lmscale = 9.5;
+        double lmscale = 1;
         while ((line = in.readLine()) != null) {
             if (line.contains("Node definitions")) {
                 readingEdges = false;
@@ -527,9 +528,15 @@ public class Lattice {
                     isFiller = true;
                 }
                 if (wordStr.equals("!SENT_START")) {
-                    wordStr = "<sil>";
+                    wordStr = "<s>";
                     isFiller = true;
                 }
+                
+                if (wordStr.equals("!SENT_END")) {
+                    wordStr = "</s>";
+                    isFiller = true;
+                }
+                
                 if (wordStr.startsWith("["))
                     isFiller = true;
                 Word word = new Word(wordStr, new Pronunciation[0], isFiller);
@@ -550,8 +557,15 @@ public class Lattice {
                 String fromId = parts[1].substring(2);
                 String toId = parts[2].substring(2);
                 double ascore = Double.parseDouble(parts[3].substring(2));
-                //double lscore = Double.parseDouble(parts[4].substring(2)) * lmscale;
-                double lscore = LogMath.LOG_ZERO * lmscale;
+                double lscore = Double.parseDouble(parts[4].substring(2)) * lmscale;
+                
+                LogMath logMath= LogMath.getLogMath();
+                lscore = logMath.linearToLog(lscore);
+                /*ascore = logMath.logToLinear((float)ascore);
+                lscore = logMath.logToLinear((float)lscore);
+                */
+                
+                //double lscore = LogMath.LOG_ZERO * lmscale;
                 lattice.addEdge(lattice.nodes.get(fromId), lattice.nodes.get(toId), ascore, lscore);
             } else {
                 // reading header here if needed
@@ -571,6 +585,8 @@ public class Lattice {
         return lattice;
     }
 
+
+        
     /**
      * 
      * @param fileName

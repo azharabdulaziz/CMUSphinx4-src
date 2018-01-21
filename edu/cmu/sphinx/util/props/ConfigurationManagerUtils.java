@@ -644,7 +644,8 @@ public final class ConfigurationManagerUtils {
         setProperty(cm, componentName, propName, propValue);
     }
 
-    public static void setProperty(ConfigurationManager cm, String componentName, String propName, String propValue) {
+  
+	public static void setProperty(ConfigurationManager cm, String componentName, String propName, String propValue) {
 
         // now set the property
         PropertySheet ps = cm.getPropertySheet(componentName);
@@ -682,6 +683,7 @@ public final class ConfigurationManagerUtils {
             default:
                 throw new RuntimeException("unknown property-type");
         }
+        
     }
 
     public static URL getURL(File file) {

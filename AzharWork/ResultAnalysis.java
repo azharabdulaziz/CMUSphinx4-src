@@ -107,6 +107,22 @@ public class ResultAnalysis {
 		return(allPaths);
 
 	}
+	/**
+	 * It shows the text f the best path from lattice.
+	 * <p>
+	 * 
+	 * @param lattice
+	 */
+	public static void ShowBestPath(Lattice lattice){
+		
+		List<Node> allPaths = lattice.getViterbiPath();
+		Iterator<Node> iter = allPaths.iterator();
+		while(iter.hasNext()) {
+			Node node = iter.next();
+			System.out.print(node.getWord() + " ");
+		}
+		System.out.println();
+	}
 	
 	/**
 	 * 
