@@ -469,8 +469,16 @@ public class Lattice {
     }
 
     /**
-     * This method will set lmscore to zero.
+     * This method reads the htk lattice file from pocketsphinx. 
      * <p>
+     * Pocketsphinx HTK lattice output:
+     * There are two path scores:
+     * <li> a score (logProb): acoustic model score. <\li>
+     * <li> p score (linear) : also called confidence score it is normalized path score. <\li>
+     * <p> 
+     * The Lattice.readhtk() has to convert it to logProb and assumes it is lmscore. 
+     * This is because I have no lm score output from pocketsphinx.
+     * 
      * @param stream
      * @return
      * @throws NumberFormatException
@@ -561,11 +569,7 @@ public class Lattice {
                 
                 LogMath logMath= LogMath.getLogMath();
                 lscore = logMath.linearToLog(lscore);
-                /*ascore = logMath.logToLinear((float)ascore);
-                lscore = logMath.logToLinear((float)lscore);
-                */
-                
-                //double lscore = LogMath.LOG_ZERO * lmscale;
+             
                 lattice.addEdge(lattice.nodes.get(fromId), lattice.nodes.get(toId), ascore, lscore);
             } else {
                 // reading header here if needed
