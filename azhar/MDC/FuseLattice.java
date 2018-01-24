@@ -392,7 +392,7 @@ public class FuseLattice {
 
 	private static Lattice NormalizeLattice(Lattice lattice) {
 		LogMath logMath = LogMath.getLogMath();
-		Lattice normLattice = new Lattice();
+		//Lattice normLattice = new Lattice();
 		float totalAmScore = getTotalAMscore(lattice,logMath);
 		
 		Collection<Edge> edges = lattice.getEdges();
@@ -405,7 +405,7 @@ public class FuseLattice {
 			lattice.updateEdge(currentEdge, normLinScore, currentEdge.getLMScore());
 		}
 		
-		return normLattice;
+		return lattice;
 	}
 
 	private static float getTotalAMscore(Lattice lattice, LogMath logMath) {
