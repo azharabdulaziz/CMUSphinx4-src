@@ -23,6 +23,7 @@ import edu.cmu.sphinx.result.Node;
 import edu.cmu.sphinx.util.LogMath;
 
 public class FuseLattice {
+	
 
 	public Lattice getLattice(String fileName) throws IOException {
 		
@@ -45,6 +46,7 @@ public class FuseLattice {
 		Lattice l6 = CombineNoScale(l3, l4);
 
 		finalLattice = CombineNoScale(l5, l6);
+		finalLattice = NormalizeLattice(finalLattice);
 		float lmWeight = 1;
 		String finalTextResult = getTextResultFromLattice(finalLattice,lmWeight);
 		return finalTextResult;
@@ -79,7 +81,7 @@ public class FuseLattice {
 		Lattice l6 = CombineScaledAM(l3, l4,alpha3,alpha4);
 
 		finalLattice = CombineNoScale(l5, l6);
-		
+		finalLattice = NormalizeLattice(finalLattice);
 		float lmWeight = 1;
 		String finalTextResult = getTextResultFromLattice(finalLattice,lmWeight);
 		return finalTextResult;
@@ -385,6 +387,37 @@ public class FuseLattice {
 		}
 
 	return fused_lattice;
+	}
+
+
+	private static Lattice NormalizeLattice(Lattice lattice) {
+		LogMath logMath = LogMath.getLogMath();
+		Lattice normLattice = new Lattice();
+		float totalAmScore = getTotalAMscore(lattice,logMath);
+		
+		Collection<Edge> edges = lattice.getEdges();
+		Iterator<Edge> iter = edges.iterator();
+		
+		while(iter.hasNext()) {
+			Edge currentEdge = iter.next();
+			double inLinScore = logMath.logToLinear((float)currentEdge.getAcousticScore());
+			double normLinScore = logMath.linearToLog(inLinScore/totalAmScore);
+			lattice.updateEdge(currentEdge, normLinScore, currentEdge.getLMScore());
+		}
+		
+		return normLattice;
+	}
+
+	private static float getTotalAMscore(Lattice lattice, LogMath logMath) {
+		float totalAmScore = 0;
+		Collection<Edge> edges = lattice.getEdges();
+		Iterator<Edge> iter = edges.iterator();
+		
+		while(iter.hasNext()) {
+			Edge edge = iter.next();
+			totalAmScore = logMath.addAsLinear((float)edge.getAcousticScore(), totalAmScore);
+		}
+		return totalAmScore;
 	}
 
 
