@@ -59,17 +59,24 @@ public class FuseLattice {
 	 * @param alpha2
 	 * @return
 	 */
-	public static String getFusedResutlScaleAM(ArrayList<Lattice> lattices, double alpha1, double alpha2) {
-		// Combine lattices
+	public static String getFusedResutlScaleAM(ArrayList<Lattice> lattices, double[] snrLogProb) {
+		// The final combined lattice
 		Lattice finalLattice = new Lattice();
+		// prepare input SNR logProb
+		double alpha1 = snrLogProb[0];
+		double alpha2 = snrLogProb[1];
+		double alpha3 = snrLogProb[2];
+		double alpha4 = snrLogProb[3];
+		
+		// prepare input lattices
 		Iterator<Lattice> latIter = lattices.iterator();
-
-		Lattice l1 = latIter.next();
-		Lattice l2 = latIter.next();
-		Lattice l3 = latIter.next();
-		Lattice l4 = latIter.next();
+		Lattice l1 = latIter.next();  // from AM10
+		Lattice l2 = latIter.next();  // from AM15
+		Lattice l3 = latIter.next();  // from AM20
+		Lattice l4 = latIter.next();  // from AM_Clean
+		
 		Lattice l5 = CombineScaledAM(l1, l2, alpha1, alpha2);
-		Lattice l6 = CombineNoScale(l3, l4);
+		Lattice l6 = CombineScaledAM(l3, l4,alpha3,alpha4);
 
 		finalLattice = CombineNoScale(l5, l6);
 		
@@ -247,7 +254,11 @@ public class FuseLattice {
 	 */
 	
 	private static Lattice CombineEdgesScaleAM(Lattice lattice1, Lattice lattice2, double alpha1, double alpha2, Lattice fused_lattice) {
-		// TODO Auto-generated method stub
+		LogMath logMath = LogMath.getLogMath();
+		// Scle Alphas to logBase
+		float newalpha1 = logMath.log10ToLog((float) alpha1);
+		float newalpha2 = logMath.log10ToLog((float) alpha2);
+		
 		Collection<Edge> edges1 = lattice1.getEdges();
 		Collection<Edge> edges2 = lattice2.getEdges();
 		Iterator<Edge> edge1_iterator = edges1.iterator();
@@ -256,8 +267,9 @@ public class FuseLattice {
 		// Add edges to the new fused lattice
 		while(edge1_iterator.hasNext()){
 			Edge currentedge = edge1_iterator.next();
+			double newAMScore = logMath.addAsLinear((float)alpha1,(float)currentedge.getAcousticScore());
 			fused_lattice.addEdge(currentedge.getFromNode(), currentedge.getToNode(),
-					alpha1*currentedge.getAcousticScore(), currentedge.getLMScore());
+					newAMScore , currentedge.getLMScore());
 		}
 
 		 
@@ -281,12 +293,10 @@ public class FuseLattice {
 				Edge e1 = e1_iteraotr.next();
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
-					
-					LogMath x = LogMath.getLogMath();
-					
-					float scaled = (float) (CurrentEdge.getAcousticScore()*alpha2);
-					accScore = x.addAsLinear((float)e1.getAcousticScore(), scaled );
-					lmScore = x.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
+					double newAMScore = logMath.addAsLinear(newalpha2 ,(float)CurrentEdge.getAcousticScore());
+					//float scaled = (float) (CurrentEdge.getAcousticScore()*alpha2);
+					accScore = logMath.addAsLinear((float)e1.getAcousticScore(), (float)newAMScore );
+					lmScore = logMath.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
 					//accScore = e1.getAcousticScore() + alpha2*CurrentEdge.getAcousticScore();
 					//lmScore = e1.getLMScore() + CurrentEdge.getLMScore();
 					
@@ -301,8 +311,9 @@ public class FuseLattice {
 			
 			//Esle, add the new edge
 			else {
+				double newAMScore = logMath.addAsLinear(newalpha2 ,(float)CurrentEdge.getAcousticScore());
 				fused_lattice.addEdge(CurrentEdge.getFromNode(), 
-						CurrentEdge.getToNode(), alpha2*CurrentEdge.getAcousticScore(), CurrentEdge.getLMScore());
+						CurrentEdge.getToNode(), newAMScore, CurrentEdge.getLMScore());
 
 			}
 			
@@ -348,8 +359,8 @@ public class FuseLattice {
 				if(CurrentEdge.isParallel(e1)) {
 					flag = true; 
 					LogMath x = LogMath.getLogMath();
-					float scaled = (float) (CurrentEdge.getAcousticScore());
-					accScore = x.addAsLinear((float)e1.getAcousticScore(), scaled );
+					float currentAMScore = (float) (CurrentEdge.getAcousticScore());
+					accScore = x.addAsLinear((float)e1.getAcousticScore(), currentAMScore );
 					lmScore = x.addAsLinear((float)e1.getLMScore(), (float)CurrentEdge.getLMScore());
 					
 					//accScore = e1.getAcousticScore() - CurrentEdge.getAcousticScore();
