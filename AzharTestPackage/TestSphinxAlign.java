@@ -14,10 +14,25 @@ public class TestSphinxAlign {
 		//randomTest();
 		String expName = "an4";
 		String baseDir = "/Users/Azhar/Desktop/MDC_Experiments/";
-		
-		
 		String refFile = baseDir+expName+"/RefClean.txt";
 		String hypFileName = "MDLFusingScaleAM.txt";
+		String hypFileLocation = baseDir + expName;
+		
+		//wholeFileTest(refFile, hypFileLocation, hypFileName);
+		int snrVal = 10;
+		String snr="";
+		if(snrVal == 0) snr = "/Results/Clean/";
+		else snr = "/Results/Noisy_"+Integer.toString(snrVal) +"db/";
+		
+		ArrayList<String> HypFile = readLines(hypFileLocation+snr+ hypFileName);
+		ArrayList<String> RefFile = readLines(refFile);
+		showWER(RefFile , HypFile);
+		
+	}
+	
+	
+	private static void wholeFileTest(String refFile, String hypFileLocation, String hypFileName) {
+		
 		ArrayList<String> Ref = readLines(refFile);
 		ArrayList<String> AlignmentResults = new ArrayList<String>();
 		int inputNoiseStarts=5;
@@ -27,14 +42,13 @@ public class TestSphinxAlign {
 		for(int snrVal=inputNoiseStarts;snrVal<=inputNoiseEnds;snrVal+=5) {
 			if(snrVal == 0) snr = "/Results/Clean/";
 			else snr = "/Results/Noisy_"+Integer.toString(snrVal) +"db/";
-			String hypFile = baseDir + expName + snr + hypFileName;
+			String hypFile = hypFileLocation+snr + hypFileName;
 			System.out.println("HypeFile is: " + hypFile);
 			ArrayList<String> Hyp = readLines(hypFile);
 			AlignmentResults = getWER(Ref,Hyp);
 		}
 		
 	}
-	
 
 	/**
 	 * Aligned Hypothesis
@@ -67,6 +81,27 @@ public class TestSphinxAlign {
 		return Results;
 	}
 
+	
+	private static void showWER(ArrayList<String> ref, ArrayList<String> hyp) {
+		NISTAlign aligner = new NISTAlign(true,true);
+		ArrayList<String> Results = new ArrayList<String> ();
+		int no_utt = ref.size();
+		for(int i=0; i<no_utt; i++) {
+			String Ref = ref.get(i);
+			String Hyp = hyp.get(i);
+			aligner.align(Ref.toUpperCase(), Hyp.toUpperCase());
+			/*String ahyp = aligner.getAlignedHypothesis();
+			String aref = aligner.getAlignedReference();*/
+			
+			aligner.printNISTSentenceSummary();
+			
+		}
+		
+		aligner.printNISTTotalSummary();
+		
+		
+		//return Results;
+	}
 
 	private static ArrayList<String> readLines(String textFile) {
 		ArrayList<String> text = new ArrayList<String>();

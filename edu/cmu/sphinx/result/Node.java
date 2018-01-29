@@ -543,7 +543,7 @@ public class Node {
     }
 
 
-    protected void cacheDescendants() {
+    public void cacheDescendants() {
         descendants = new HashSet<Node>();
         cacheDescendantsHelper(this);
     }

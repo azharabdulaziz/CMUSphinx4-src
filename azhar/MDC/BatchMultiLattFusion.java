@@ -145,11 +145,11 @@ public class BatchMultiLattFusion {
 		if(expName.equalsIgnoreCase("an4")) {
 			noiseType = "_White";
 		}
-	
-		String accModel1 = expName +noiseType + "10dB.cd_cont_200/Lattice/";
-		String accModel2 = expName +noiseType + "15dB.cd_cont_200/Lattice/";
-		String accModel3 = expName +noiseType + "20dB.cd_cont_200/Lattice/";
-		String accModel4 = expName + "_Clean.cd_cont_200/Lattice/";
+		String accModel1 = expName + "_Clean.cd_cont_200/Lattice/";
+		String accModel2 = expName +noiseType + "10dB.cd_cont_200/Lattice/";
+		String accModel3 = expName +noiseType + "15dB.cd_cont_200/Lattice/";
+		String accModel4 = expName +noiseType + "20dB.cd_cont_200/Lattice/";
+		
 		String[] AcModel = {accModel1, accModel2,accModel3,accModel4};
 		
 		

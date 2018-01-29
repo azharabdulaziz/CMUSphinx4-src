@@ -16,7 +16,7 @@ public class MultDecoderlatticeFusion {
 		String expName = "an4";   // Could be variable
 		String expBaseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/";
 		
-		preMAPdecodeScaleAM(expName, expBaseDir,5,50);
+		preMAPdecodeScaleAM(expName, expBaseDir,5,40);
 	}
 
 	private static void preMAPdecode(String expName, String expBaseDir, int inputNoiseStarts, int inputNoiseEnds) throws IOException {
@@ -115,7 +115,7 @@ public class MultDecoderlatticeFusion {
                 Double A1 = Double.parseDouble(SNRlogProb[1]);
                 Double A2 = Double.parseDouble(SNRlogProb[2]);
                 Double A3 = Double.parseDouble(SNRlogProb[3]);
-                double[] e = {A0/100000,A1/100000,A2/100000,A3/100000};
+                double[] e = {A3/100000,A0/100000,A1/100000,A2/100000};
 				/*System.out.println("AM10 = " + SNRlogProb[0] + "  AM15 =" + SNRlogProb[1] + 
                 		"  AM20 = " + SNRlogProb[2] + "  Clean = " + SNRlogProb[3]);*/
                 STSlogProb.add(e);
