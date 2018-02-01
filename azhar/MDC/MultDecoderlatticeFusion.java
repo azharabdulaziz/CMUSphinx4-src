@@ -16,7 +16,7 @@ public class MultDecoderlatticeFusion {
 		String expName = "an4";   // Could be variable
 		String expBaseDir = "/Users/Azhar/Desktop/MDC_Experiments/"+ expName + "/";
 		
-		preMAPdecodeScaleAM(expName, expBaseDir,5,40);
+		preMAPdecodeScaleAM(expName, expBaseDir,50,50);
 	}
 
 	private static void preMAPdecode(String expName, String expBaseDir, int inputNoiseStarts, int inputNoiseEnds) throws IOException {

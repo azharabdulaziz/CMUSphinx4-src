@@ -82,8 +82,12 @@ public class BatchMultiLattFusion {
 			}
 			
 			// Combine lattices
+			
+			Lattice finalLatt = new Lattice();
+			FuseLattice fl = new FuseLattice(finalLatt );
+			
 			long StartTime = System.nanoTime();
-			String hyp = FuseLattice.getFusedResutlNoScaleAM(lattices);
+			String hyp = fl.getFusedResutlNoScaleAM(lattices);
 			long EndTime = System.nanoTime();
 			// Estimate elapsed time for attice fusion
 			long FusionDuration = EndTime - StartTime;
@@ -207,10 +211,12 @@ public class BatchMultiLattFusion {
 			// Get STS-SNR logProb to weight lattice path(links)
 			double[] snrLogProb = stsLogProb.get(file_no);
 			
+			Lattice finalLatt = new Lattice();
+			FuseLattice fl = new FuseLattice(finalLatt );
 			// Combine lattices
 			long StartTime = System.nanoTime();
 			//String hyp = FuseLattice.getFusedResutlNoScaleAM(lattices);
-			String hyp = FuseLattice.getFusedResutlScaleAM(lattices, snrLogProb);
+			String hyp = fl.getFusedResutlScaleAM(lattices, snrLogProb);
 			long EndTime = System.nanoTime();
 			// Estimate elapsed time for attice fusion
 			long FusionDuration = EndTime - StartTime;

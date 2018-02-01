@@ -74,8 +74,6 @@ public class TestSphinxAlign {
 			
 			
 		}
-		
-		
 		aligner.printTotalSummary();
 		
 		return Results;

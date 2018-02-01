@@ -25,15 +25,25 @@ import edu.cmu.sphinx.util.LogMath;
 public class FuseLattice {
 	
 
-	public Lattice getLattice(String fileName) throws IOException {
+	protected int currentID;
+	protected final Lattice finalLattice;
+
+	
+
+	public FuseLattice(Lattice finalLatt) {
+		this.finalLattice = finalLatt;
+		this.currentID = 0;
+	}
+
+	/*public Lattice getLattice(String fileName) throws IOException {
 		
 		Lattice lattice = Lattice.readhtk(fileName);
 		//lattices.add(lattice);
 		return lattice;
 
 	}
-	
-	public static String getFusedResutlNoScaleAM(ArrayList<Lattice> lattices) {
+*/	
+	public String getFusedResutlNoScaleAM(ArrayList<Lattice> lattices) {
 		// Combine lattices
 		Lattice finalLattice = new Lattice();
 		Iterator<Lattice> latIter = lattices.iterator();
@@ -61,7 +71,7 @@ public class FuseLattice {
 	 * @param alpha2
 	 * @return
 	 */
-	public static String getFusedResutlScaleAM(ArrayList<Lattice> lattices, double[] snrLogProb) {
+	public String getFusedResutlScaleAM(ArrayList<Lattice> lattices, double[] snrLogProb) {
 		// The final combined lattice
 		Lattice finalLattice = new Lattice();
 		// prepare input SNR logProb
@@ -132,7 +142,7 @@ public class FuseLattice {
 	 * 
 	 */
 	
-	public static Lattice CombineScaledAM(Lattice lattice1, Lattice lattice2, double alpha1, double alpha2){
+	public Lattice CombineScaledAM(Lattice lattice1, Lattice lattice2, double alpha1, double alpha2){
 		Lattice fused_lattice = new Lattice();
 
 		Node initialNode = lattice1.getInitialNode();
@@ -170,7 +180,7 @@ public class FuseLattice {
 	 * @param lattice2
 	 * @return
 	 */
-	public static Lattice CombineNoScale(Lattice lattice1, Lattice lattice2){
+	public Lattice CombineNoScale(Lattice lattice1, Lattice lattice2){
 		Lattice fused_lattice = new Lattice();
 
 		Node initialNode = lattice1.getInitialNode();
@@ -210,7 +220,7 @@ public class FuseLattice {
  * @param fused_lattice
  * @return
  */
-	private static Lattice CombineNodes(Lattice lattice1, Lattice lattice2,Lattice fused_lattice) {
+	private Lattice CombineNodes(Lattice lattice1, Lattice lattice2,Lattice fused_lattice) {
 		// TODO Auto-generated method stub
 		
 		Collection<Node> nodes1 = lattice1.getNodes();
@@ -221,6 +231,7 @@ public class FuseLattice {
 		
 		// Add Nodes to the new fused lattice
 		while(node1_iterator.hasNext()){
+			String nodeID = Integer.toString(this.currentID++);
 			Node current_node = node1_iterator.next();
 			// Change the start and end words id <s> and </s>
 			if(current_node.getWord().isSentenceStartWord()){
@@ -230,11 +241,15 @@ public class FuseLattice {
 				current_node.setId(Integer.toString(999999));
 			}
 
-			fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
+			
+			
+			fused_lattice.addNode(nodeID, current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
 		}
 
 		while(node2_iterator.hasNext()){
+			String nodeID = Integer.toString(this.currentID++);
 			Node current_node = node2_iterator.next();
+			
 			// Change the start and end words id <s> and </s>
 			if(current_node.getWord().isSentenceStartWord()){
 				current_node.setId(Integer.toString(0));
@@ -244,7 +259,7 @@ public class FuseLattice {
 			}
 
 
-			fused_lattice.addNode(current_node.getId(), current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
+			fused_lattice.addNode(nodeID, current_node.getWord().toString(), current_node.getBeginTime(), current_node.getEndTime());
 		}
 
 
