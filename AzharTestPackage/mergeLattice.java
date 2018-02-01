@@ -32,7 +32,7 @@ public class mergeLattice {
 	protected int currentID;
 	protected boolean initialNodeSet; 
 	private Map<Integer, Integer> idsLookup;
-	private LogMath logMath;
+	
 	//private int noOfExistentNodes; 
 
 	public mergeLattice(Lattice mergedLattice) {
@@ -43,7 +43,7 @@ public class mergeLattice {
 		this.idsLookup = new HashMap<>();
 		this.TerminalBeginTime = 0;
 		this.initEndTime = 0;
-		logMath.getLogMath();
+		
 		//this.noOfExistentNodes = 0;
 		
 	}
@@ -65,7 +65,7 @@ public class mergeLattice {
 		
 	}
 	
-	public void Merge(Lattice lattice, float snrWeight) {
+	public void Merge(Lattice lattice, float snrLogProb) {
 		/**
 		 *  1- Add all nodes of incomming lattice
 		 *  Note that only the first lattice's init node is set to be the init node for the final 
@@ -77,7 +77,7 @@ public class mergeLattice {
 		
 		//checkLookupTable();
 		
-		addEdges(lattice, snrWeight);
+		addEdges(lattice, snrLogProb);
 		
 		
 	}
@@ -108,7 +108,7 @@ public class mergeLattice {
 	}
 
 private void addEdges(Lattice lattice, float snrWeight) {
-		
+		LogMath logMath = LogMath.getLogMath();
 		Collection<Edge> edges = lattice.getEdges();
 		Iterator<Edge> iter = edges.iterator();
 		while(iter.hasNext()) {

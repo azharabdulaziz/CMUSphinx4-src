@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import edu.cmu.sphinx.linguist.dictionary.Word;
 import edu.cmu.sphinx.result.Edge;
@@ -18,15 +19,16 @@ public class TestLatticeFusion {
 	public static void main(String[] args) throws IOException {
 		
 		String[] label1 = {"hell","or","wood"};
-		String[] label2 = {"hello","world"};
-		String[] label3 = {"hell", "yard"};
-		String[] label4 = {"hi", "all","your"," guard"};
-		//String[] label3 = {"GG","HH","II"};
+		String[] label2 = {"hallo","word"};
+		String[] label3 = {"how", "word"};
+		String[] label4 = {"how", "all","yard"};
+		
 
-		Lattice lattice1 = CreateLattice(label1,1);
-		Lattice lattice2 = CreateLattice(label2,1);
-		Lattice lattice3 = CreateLattice(label3,1);
 		Lattice lattice4 = CreateLattice(label4,1);
+		Lattice lattice1 = CreateLattice(label3,1);
+		Lattice lattice2 = CreateLattice(label1,1);
+		Lattice lattice3 = CreateLattice(label2,1);
+		
 		
 		// merge lattices
 		Lattice fusedLattice = new Lattice();
@@ -34,9 +36,9 @@ public class TestLatticeFusion {
 		ml.Merge(lattice1);
 		ml.Merge(lattice2);
 		ml.Merge(lattice3);
-		//ml.Merge(lattice4);
-		fusedLattice.computeNodePosteriors(1.0f);
-		fusedLattice.getViterbiPath();
+		ml.Merge(lattice4);
+		
+		System.out.println("Result: "+getTextResultFromLattice(fusedLattice, 1.0f));
 		
 		fusedLattice.dumpDot("FuseLAtticeTest.dot","FuseLAttice Testing My algorithm" );
 		lattice1.dumpDot("Lattice1.dot", "TestLAtticeFusion");
@@ -46,6 +48,31 @@ public class TestLatticeFusion {
 	}
 	
 	
+
+	/**
+	 * 
+	 * @param finalLattice
+	 * @param lmWeight
+	 * @return
+	 */
+	public static String getTextResultFromLattice(Lattice finalLattice, float lmWeight) {
+		finalLattice.computeNodePosteriors(lmWeight);
+		List<Node> nodes = finalLattice.getViterbiPath();
+		Iterator<Node> nodeItr = nodes.iterator();
+		String textResult="";
+		while(nodeItr.hasNext()) {
+			textResult = textResult + nodeItr.next().getWord()+" ";
+		}
+		
+		String finalTextResult = textResult.replace("<s>", "");
+		finalTextResult = finalTextResult.replace("</s>","");
+		finalTextResult = finalTextResult.replace("<sil>","");
+		finalTextResult = finalTextResult.trim().replaceAll(" +", " ");
+		finalTextResult = finalTextResult.trim();
+		//System.out.println("Final Text: " + finalTextResult);
+
+		return finalTextResult;
+	}
 
 	public static Lattice FuseLattices(Lattice lattice1,Lattice lattice2) {
 		Lattice fusedLattice = new Lattice();
