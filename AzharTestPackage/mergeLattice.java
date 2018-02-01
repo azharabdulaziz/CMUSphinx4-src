@@ -19,7 +19,8 @@ import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
 
 /**
- * @author Azhar
+ * @author Azhar Abdulaziz
+ * {@docRoot}
  *
  */
 public class mergeLattice {
