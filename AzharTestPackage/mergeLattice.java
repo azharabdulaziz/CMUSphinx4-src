@@ -17,6 +17,7 @@ import edu.cmu.sphinx.linguist.dictionary.Word;
 import edu.cmu.sphinx.result.Edge;
 import edu.cmu.sphinx.result.Lattice;
 import edu.cmu.sphinx.result.Node;
+import edu.cmu.sphinx.util.LogMath;
 
 /**
  * @author Azhar Abdulaziz
@@ -31,6 +32,7 @@ public class mergeLattice {
 	protected int currentID;
 	protected boolean initialNodeSet; 
 	private Map<Integer, Integer> idsLookup;
+	private LogMath logMath;
 	//private int noOfExistentNodes; 
 
 	public mergeLattice(Lattice mergedLattice) {
@@ -41,6 +43,7 @@ public class mergeLattice {
 		this.idsLookup = new HashMap<>();
 		this.TerminalBeginTime = 0;
 		this.initEndTime = 0;
+		logMath.getLogMath();
 		//this.noOfExistentNodes = 0;
 		
 	}
@@ -55,9 +58,26 @@ public class mergeLattice {
 		//addNodesTest(lattice);
 		addNodes(lattice);
 		
-		checkLookupTable();
+		//checkLookupTable();
 		
 		addEdges(lattice);
+		
+		
+	}
+	
+	public void Merge(Lattice lattice, float snrWeight) {
+		/**
+		 *  1- Add all nodes of incomming lattice
+		 *  Note that only the first lattice's init node is set to be the init node for the final 
+		 *  merged lattice. This is controlled by the flag initialNodeSet.
+		 *  For all inccoming lattices, the init node is added to the currentNodes list. 
+		 */
+		//addNodesTest(lattice);
+		addNodes(lattice);
+		
+		//checkLookupTable();
+		
+		addEdges(lattice, snrWeight);
 		
 		
 	}
@@ -79,6 +99,31 @@ public class mergeLattice {
 			Node fromNode= getNodebyId(newFromNodeId);
 			Node toNode = getNodebyId(newToNodeId);
 			double acousticScore = current_edge.getAcousticScore();
+			double lmScore = current_edge.getLMScore();
+			
+			this.mergedLattice.addEdge(fromNode, toNode, acousticScore, lmScore);
+		}
+		
+		
+	}
+
+private void addEdges(Lattice lattice, float snrWeight) {
+		
+		Collection<Edge> edges = lattice.getEdges();
+		Iterator<Edge> iter = edges.iterator();
+		while(iter.hasNext()) {
+			Edge current_edge = iter.next();
+			
+			int oldFromNodeID = Integer.parseInt(current_edge.getFromNode().getId());
+			int newFromNodeId = this.idsLookup.get(oldFromNodeID);
+			//this.idsLookup.remove(oldFromNodeID);
+			int oldToNodeID = Integer.parseInt(current_edge.getToNode().getId());
+			int newToNodeId = this.idsLookup.get(oldToNodeID);
+			//this.idsLookup.remove(oldToNodeID);
+			
+			Node fromNode= getNodebyId(newFromNodeId);
+			Node toNode = getNodebyId(newToNodeId);
+			double acousticScore = logMath.addAsLinear((float)current_edge.getAcousticScore(),snrWeight);
 			double lmScore = current_edge.getLMScore();
 			
 			this.mergedLattice.addEdge(fromNode, toNode, acousticScore, lmScore);
